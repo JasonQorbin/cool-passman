@@ -4,6 +4,7 @@
   "description": "Full stack credential management system for Cool-Tech",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "mocha"
   },
   "keywords": [
