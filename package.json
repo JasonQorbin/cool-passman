@@ -1,0 +1,18 @@
+{
+  "name": "cool-tech-cred-manager",
+  "version": "0.1.0",
+  "description": "Full stack credential management system for Cool-Tech",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "ExpressJS",
+    "Mocha",
+    "Chai",
+    "React",
+    "CRUD"
+  ],
+  "author": "JasonQorbin",
+  "license": "MIT"
+}
