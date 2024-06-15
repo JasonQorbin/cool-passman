@@ -13,5 +13,7 @@ app.get('/', (request, response) => {
     response.status(200).send("Hello World!!!").end();
 });
 
-app.listen(PORT, () => {console.log(`Server now listening on port ${PORT}`)});
+const http = app.listen(PORT, () => {console.log(`Server now listening on port ${PORT}`)});
 
+module.exports.app = app;
+module.exports.http = http;
