@@ -1,8 +1,13 @@
-const mongoose = required('mongoose');
+const mongoose = require('mongoose');
 
-const userModel = mongoose.Schema(
+const userSchema = mongoose.Schema(
     {
-        name : {
+        firstName : {
+            type : String,
+            trim : true,
+            required : true
+        },
+        lastName : {
             type : String,
             trim : true,
             required : true
@@ -23,7 +28,7 @@ const userModel = mongoose.Schema(
             type : String,
             required : true,
             default : "user"
-        }
+        },
         authorised_repos : [
             {
                 orgID : {
@@ -35,5 +40,7 @@ const userModel = mongoose.Schema(
         ]
     }
 );
+
+const userModel = mongoose.model("users", userSchema);
 
 module.exports.userModel = userModel;

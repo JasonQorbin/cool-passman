@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
  * Model for an organisation. Contains an array of sub-documents for the departments and within that is
  * The repo for that department in the form of a list of credentials as documents.
  */
-const orgModel = mongoose.Schema(
+const orgSchema = mongoose.Schema(
     {
         name : {
             type : String,
@@ -26,7 +26,6 @@ const orgModel = mongoose.Schema(
                             type : String,
                             required : true,
                             trim : true,
-                            unique : true
                         },
                         URL : String,
                         username : String,
@@ -38,5 +37,7 @@ const orgModel = mongoose.Schema(
         ]
     }
 );
+
+const orgModel = mongoose.model("orgs", orgSchema);
 
 module.exports.orgModel = orgModel;
