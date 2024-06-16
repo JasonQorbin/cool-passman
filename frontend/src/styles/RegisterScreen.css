@@ -1,0 +1,20 @@
+.registration-label-wrapper {
+    display : inline-block;
+    width : 180px;
+    text-align : right;
+    margin : 0 1rem;
+}
+
+#registration-content-wrapper {
+    display : flex;
+    flex-direction : column;
+    justify-content : center;
+    text-align : center; 
+    width : 60%;
+    min-width : 480px;
+}
+
+#registration-button {
+    font-size : 16pt;
+    padding : 0 0.5rem;
+}

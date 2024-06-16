@@ -1,0 +1,20 @@
+.form-row {
+    margin : 1rem;
+}
+
+.login-label-wrapper {
+    display: inline-block;
+    width: 100px;
+    text-align : right;
+    margin : 0 1rem;
+}
+
+.login-field {
+    width: 200px;
+    margin : 0 15px;
+}
+
+#login-button {
+    font-size : 14pt;
+    padding: 0 0.5rem;
+}

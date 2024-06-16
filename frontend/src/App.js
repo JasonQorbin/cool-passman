@@ -1,10 +1,11 @@
-import logo from './logo.svg';
 import './App.css';
+import LoginScreen from "./components/LoginScreen";
+import RegisterScreen from "./components/RegisterScreen";
 
 function App() {
   return (
     <div className="App">
-            Hello World!!!
+            <RegisterScreen />
     </div>
   );
 }
