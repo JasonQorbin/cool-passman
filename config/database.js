@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 //This name is only used when using the localhost
 const databaseName = "CredRepo";
 const testingSuffix = "-TEST";
-var localConnectionString = `mongodb://127.0.0.1:27017/${databaseName}`;
+let localConnectionString = `mongodb://127.0.0.1:27017/${databaseName}`;
+let connectionObject;
 
-if (process.env.TESTING) {
+
+if (process.env.NODE_ENV === 'testing') {
     localConnectionString = localConnectionString + testingSuffix;
 }
 
@@ -16,7 +18,7 @@ if (!connectionString) {
 
 async function connectToDatabase() {
     console.log(`[INFO] Connectiong to MongoDB: ${connectionString}`);
-    await mongoose.connect(connectionString)
+    connectionObject = await mongoose.connect(connectionString)
         .catch( error => {
             console.log(`[FATAL ERROR] Could not connect to database: ${error.message}`);
             process.exit(1);
@@ -28,4 +30,12 @@ async function connectToDatabase() {
     });
 }
 
+function disconnectFromDatabase() {
+    if (connectionObject) {
+        connectionObject.disconnect();
+        connectionObject = null;
+    }
+}
+
 module.exports.connectToDatabase = connectToDatabase;
+module.exports.disconnectFromDatabase = disconnectFromDatabase;
