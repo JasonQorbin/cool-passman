@@ -1,0 +1,11 @@
+#page-header {
+    padding : 0 40px;
+}
+
+#page-header-divider {
+    display : block;
+    height : 8px;
+    margin : 10px auto;
+    background : blue;
+}
+

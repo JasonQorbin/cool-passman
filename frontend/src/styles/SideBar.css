@@ -1,0 +1,36 @@
+#home-screen-sidebar {
+    display : inline-block;
+    height : 100%;
+    width : 250px;
+    border-right : 3px maroon solid;
+
+}
+
+#sidebar-items-list {
+    list-style-type : none;
+    margin : 0;
+    padding : 0;
+    text-align : center;
+}
+
+.sidebar-item {
+    display: inline-block;
+    font : 18pt grey Verdana, sans-serif;
+    text-decoration : none;
+    margin : 10px 0;
+    transition : padding 0.5s;
+
+}
+
+#sidebar-items-list li:hover {
+}
+
+.sidebar-item:hover {
+    text-decoration-color : navyblue;
+    text-decoration : underline;
+    text-decoration-thickness : 5px;
+    padding-top : 13px;
+    padding-bottom : 18px;
+}
+
+
