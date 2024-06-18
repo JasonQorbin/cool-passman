@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { userModel } = require('../models/users');
+const createStatsCollector = require('mocha/lib/stats-collector');
 
 //JWT Secret:
 //It's ok to just use a default here because we've already checked that the variables have been setup properly in
@@ -10,6 +11,8 @@ let jwtSecret = process.env.TOKEN_SECRET || "Testing_Secret";
 
 //Status Codes
 const SUCCESS       = 200;
+const CREATED       = 201;
+const BAD_REQUEST   = 400;
 const UNAUTHORISED  = 401;
 const FORBIDDEN     = 403;
 
@@ -27,6 +30,12 @@ function getToken(payload) {
     return jwt.sign(JSON.stringify(payload), jwtSecret, {algorithm: 'HS256'} );
 }
 
+function createTokenFromUser(userDoc) {
+    const authorisedEntities = userDoc.authorised_repos;
+    authorisedEntities.push(userDoc._id);
+    const payload = { keychain : authorisedEntities, role : userDoc.role };
+    return getToken(payload);
+}
 
 /**
  * Helper function to handle all cases where authentication fails.
@@ -77,17 +86,43 @@ async function authenticateUser( request, response ) {
         return;
     }
     
-    const authorisedEntities = userDoc.authorised_repos;
-    authorisedEntities.push(userDoc._id);
-    
-    const token = getToken({ keychain : authorisedEntities });
+    const generatedToken = createTokenFromUser(userDoc);
     response.status(SUCCESS)
-            .send({ "token" : token})
+            .send({ "token" : generatedToken})
             .end();
 }
 
-function registerNewUser( request, response ) {
+async function registerNewUser( request, response ) {
+    const haveRequiredFields = request.body.hasOwnProperty('firstname') &&   
+        request.body.hasOwnProperty('lastname') && 
+        request.body.hasOwnProperty('email') && 
+        request.body.hasOwnProperty('password');
+
+    if (!haveRequiredFields) {
+        response.status(BAD_REQUEST)
+        .end();
+        return;
+    }
+
+    const newUser = new userModel({
+        firstName:request.body.firstname,
+        lastName:request.body.lastname,
+        email:request.body.email,
+        password:request.body.password,
+        authorised_repos: []
+    });
+
+    if (request.body.hasOwnProperty('position')) {
+        newUser.position = request.body.position;
+    }
     
+    const savedUser = await newUser.save();
+
+    const token = createTokenFromUser(savedUser);
+
+    response.status(CREATED)
+        .send({"token" : token })
+        .end();
 }
 
 module.exports = {

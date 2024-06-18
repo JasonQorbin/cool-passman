@@ -5,16 +5,17 @@ const chaitHttp = require('chai-http');
 const expect = chai.expect;
 const { resetDatabase } = require('../tools/resetDatabase');
 const { disconnectFromDatabase } = require('../config/database');
-const { mongoose } = require('mongoose');
 chai.use(chaitHttp);
 
 //Status codes
 
 const SUCCESS      = 200;
+const CREATED      = 201;
+const BAD_REQUEST  = 400;
 const UNAUTHORISED = 401;
 const FORBIDDEN    = 403;
 
-describe("Sample test", () => {
+describe("Route tests", () => {
  
     beforeEach( (done) => {
         resetDatabase(true).then( ()=> {
@@ -86,5 +87,40 @@ describe("Sample test", () => {
                 done();
             });
     });
+    
+    it("Register new user succesfully", done => {
+        const requestObject = {
+            firstname : "Richard",
+            lastname : "Feldman",
+            email : "Software-user99@example.com",
+            password : "password"
+        }
+        chai.request(app)
+            .post('/api/register')
+            .send(requestObject)
+            .end((error, response) => {
+                expect(error).to.be.null;
+                expect(response.status).to.equal(CREATED);
+                expect(response.body.hasOwnProperty('token')).to.be.true;
+                done();
+            });
+    });
+    
+    it("Register new user fails due to missing field", done => {
+        const requestObject = {
+            firstname : "Richard",
+            lastname : "Feldman",
+            password : "password"
+        }
+        chai.request(app)
+            .post('/api/register')
+            .send(requestObject)
+            .end((error, response) => {
+                expect(error).to.be.null;
+                expect(response.status).to.equal(BAD_REQUEST);
+                done();
+            });
+    });
+    
 
 });
