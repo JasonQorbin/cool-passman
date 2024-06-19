@@ -1,10 +1,11 @@
 import "./App.css";
 import { Routes, Route, Outlet } from "react-router-dom";
 import PageHeader from "./components/PageHeader";
-import SideBar from "./components/SideBar";
+import SideBar from "./components/SideBar"; 
 import LoginScreen from "./components/LoginScreen";
 import RegisterScreen from "./components/RegisterScreen";
 import HomeScreen from "./components/HomeScreen";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/" element={<MainPageLayout />}>
                 <Route path="/home" element={<HomeScreen />} />
+                <Route path="/admin" element={<AdminPanel />} />
             </Route>
         </Routes>
     </div>

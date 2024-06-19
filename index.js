@@ -9,6 +9,9 @@ const bodyParser = require( 'body-parser' );
 const helmet = require('helmet');
 //Routers
 const authRouter = require('./routes/loginRoutes');
+const orgRouter = require('./routes/orgRoutes');
+//Custom middleware
+const { requestLogging } = require('./middleware/logging');
 //Database
 const { connectToDatabase } = require('./config/database');
 
@@ -27,10 +30,13 @@ app.use(helmet());
 app.use(bodyParser.urlencoded( {  extended : true } ));
 app.use(bodyParser.json());
 
+app.use(requestLogging);
+
 app.get('/', (request, response) => {
     response.status(200).send("Hello World!!!").end();
 });
 
+app.use('/api/org',orgRouter);
 app.use('/api', authRouter);
 
 connectToDatabase();

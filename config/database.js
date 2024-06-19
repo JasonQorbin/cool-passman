@@ -17,7 +17,7 @@ if (!connectionString) {
 
 
 async function connectToDatabase() {
-    console.log(`[INFO] Connectiong to MongoDB: ${connectionString}`);
+    console.log(`[INFO] Connecting to MongoDB: ${connectionString}`);
     connectionObject = await mongoose.connect(connectionString)
         .catch( error => {
             console.log(`[FATAL ERROR] Could not connect to database: ${error.message}`);

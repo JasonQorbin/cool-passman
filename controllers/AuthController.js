@@ -125,7 +125,17 @@ async function registerNewUser( request, response ) {
         .end();
 }
 
+
+function verifyAndDecodeToken(token) {
+    try {
+        return jwt.verify(token, jwtSecret);
+    } catch (error) {
+        throw new Error("Not verified");
+    }
+}
+
 module.exports = {
     authenticateUser,
-    registerNewUser
+    registerNewUser,
+    verifyAndDecodeToken
 }
