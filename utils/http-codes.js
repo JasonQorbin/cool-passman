@@ -8,6 +8,7 @@ const UNAUTHORISED           = 401; //The requestor could not be authenticated. 
 const FORBIDDEN              = 403; //The requester was positively authenticated but is not authorized to access the resource.
                                     //A retry will not change the outcome.
 const NOT_FOUND              = 404;
+const CONFLICT               = 409; //The requested change conflicts with the current state of the server.
 const GONE                   = 410; //The requested resource has been pernamently deleted.
 const UNSUPPORTED_MEDIA_TYPE = 415; //The request's Content-Type is wrong
 const TOO_MANY_REQUESTS      = 429; //Rate limit exceeded
@@ -23,6 +24,7 @@ module.exports = {
     UNAUTHORISED,
     FORBIDDEN,
     NOT_FOUND,
+    CONFLICT,
     GONE,
     UNSUPPORTED_MEDIA_TYPE,
     TOO_MANY_REQUESTS,

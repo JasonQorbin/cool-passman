@@ -39,3 +39,17 @@ export function getData(url, setData, setLoading, setLoaded, setErrorMsg, setErr
             );
     });
 }
+
+export function postData(url, bodyContent, responseCallback) {
+    const fetchProperties = {
+        method : 'POST',
+        headers : {
+            "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(bodyContent)
+    }
+    fetch(url, fetchProperties)
+        .then( response => {
+            responseCallback(response);
+        });
+}

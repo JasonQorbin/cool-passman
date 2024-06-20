@@ -1,6 +1,6 @@
 import '../styles/SimpleItemTable.css';
 
-export default function OrgTable(props) {
+export default function SimpleItemTable(props) {
     const tableRows = props.items.map( item => {
         return (
             <tr 

@@ -1,5 +1,4 @@
 /* Global styles will be placed in this file */
-
 .centre-container {
     display : flex;
     flex-direction: column;
@@ -30,4 +29,19 @@ span.vertical-spacer {
     flex-direction : row;
     height : 100vh;
     width : 100%;
+}
+
+.transparent-layer {
+    position : absolute;
+    top : 0;
+    left : 0;
+    height : 100vh;
+    width : 100vw;
+    background-color : rgb(13 13 13 / 0.6);
+}
+
+#input-window {
+    background : white;
+    padding : 30px;
+    border : 3px blue solid;
 }

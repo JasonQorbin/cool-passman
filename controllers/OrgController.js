@@ -32,7 +32,23 @@ async function getListOfDepts(request, response) {
      
 }
 
+async function addNewOrg(request, response) {
+    const newOrg = new orgModel( {name : request.body.name });
+    const savedOrg = await newOrg.save();
+    if (savedOrg === newOrg) {
+        console.log(savedOrg);
+        response.status(StatusCodes.CREATED)
+                .send(savedOrg)
+                .end();
+    } else {
+        response.status(StatusCodes.CONFLICT)
+                .send({error: "Couldn't create new OU"})
+                .end();
+    }
+}
+
 module.exports = {
     getListOfAllOrgs,
-    getListOfDepts
+    getListOfDepts,
+    addNewOrg
 }

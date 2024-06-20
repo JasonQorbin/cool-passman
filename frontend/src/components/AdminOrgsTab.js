@@ -1,7 +1,8 @@
 import '../styles/AdminOrgsTab.css';
-import { getData } from '../utils/fetching';
+import { getData, postData } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 import SimpleItemTable from './SimpleItemTable';
+import TransparentTextInputOverlay from './TransparentTextInputOverlay';
 import { useState } from 'react';
 
 function AdminOrgUnitsPanel() {
@@ -18,6 +19,8 @@ function AdminOrgUnitsPanel() {
     const [selectedOrg, setSelectedOrg] = useState(null);
     const [selectedDept, setSelectedDept] = useState(null);
 
+    const [overLayDisplayed, setOverlayDisplay] = useState(false);
+
     if (!loadedOrgs && !loadingOrgs) {
         getData('/api/org', setOrgs, setLoadingOrgs, setLoadedOrgs, setErrorMsg, setErrorState)
             .catch( () => console.log("Error while fetching OU data"));
@@ -27,10 +30,62 @@ function AdminOrgUnitsPanel() {
         getData(`/api/org/${selectedOrg}`, setDepts, setLoadingDepts, setLoadedDepts, setErrorMsg, setErrorState)
             .catch( () => console.log("Error while fetching department data"));
     }
+    
+    function selectNewOrg(newOrg) {
+        setSelectedOrg(newOrg);
+        setSelectedDept(null);
+        setLoadedDepts(false);
+    }
+
+    function cancelOverlay() {
+        setOverlayDisplay(null);
+    }
+
+    function addOrgUnitButtonPress() {
+        setOverlayDisplay({
+            title: "New OU Name:",
+            defaultValue : "",
+            callback : postNewOU,
+            cancelCallback : cancelOverlay
+        })
+    }
+
+    function postNewOU(newName) {
+        setOverlayDisplay(null);
+        const objectToPost = { name : newName };
+        postData('/api/org', objectToPost, handleAddOrgResult);
+    }
+
+    function handleAddOrgResult(response) {
+        if (response.status == 201) {
+            setSelectedDept(null);
+            setSelectedOrg(null);
+            response.json()
+                .then( data => {
+                    //Todo: Toast showing success
+                    const newOrgs = Array.from(orgs);
+                    newOrgs.push(data);
+                    setOrgs(newOrgs);
+                });   
+        } else {
+            //Toast showing error message
+        }
+        
+    }
+
+    const overlay = [];
+    if (overLayDisplayed) {
+        overlay.push(<TransparentTextInputOverlay key="overlay"
+            title={overLayDisplayed.title}
+            defaultValue={overLayDisplayed.defaultValue}
+            submitCallback = {overLayDisplayed.callback}
+            closeCallback = {cancelOverlay}
+        />)
+    }
 
     const orgUnitButtons = [];
     if (loadedOrgs && !errorState) {
-        orgUnitButtons.push(<button key="add-ou-button">Add OU</button>);
+        orgUnitButtons.push(<button key="add-ou-button" onClick={addOrgUnitButtonPress}>Add OU</button>);
         if (selectedOrg) {
             orgUnitButtons.push(<button key="rename-ou-button">Rename OU</button>);
             orgUnitButtons.push(<button key="delete-ou-button">Delete OU</button>);
@@ -55,7 +110,7 @@ function AdminOrgUnitsPanel() {
             tableGroups.push(
                 <div className="table-group" key="orgs">
                     {orgUnitButtons}
-                    <SimpleItemTable title="Organisational Units" items={orgs} setSelectedCb={setSelectedOrg} selected={selectedOrg} />
+                    <SimpleItemTable title="Organisational Units" items={orgs} setSelectedCb={selectNewOrg} selected={selectedOrg} />
                 </div>
             );
         }
@@ -80,6 +135,7 @@ function AdminOrgUnitsPanel() {
     } else {
         return (
             <div id="admin-org-unit-tab">
+                {overlay}
                 {tableGroups}
             </div>
         );
