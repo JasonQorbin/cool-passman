@@ -1,0 +1,15 @@
+#admin-org-unit-tab {
+    padding : 30px;
+    display : flex;
+    flex-direction : row;
+    flex-wrap : wrap;
+}
+
+#admin-org-unit-tab div.table-group {
+    min-width : 400px;
+}
+
+#admin-org-unit-tab button{
+    margin : 5px 15px;
+}
+

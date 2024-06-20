@@ -1,0 +1,19 @@
+table {
+    border-collapse : collapse;
+    margin : 20px;
+}
+
+th, td {
+    border : 1px grey solid;
+    padding : 5px;
+    min-width : 300px;
+}
+
+tbody tr.selected {
+    background : lightsalmon;
+}
+
+
+tbody tr:hover {
+    background : lightpink;
+}
