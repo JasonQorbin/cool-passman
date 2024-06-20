@@ -1,5 +1,5 @@
 import '../styles/AdminOrgsTab.css';
-import { getData, postData } from '../utils/fetching';
+import { getData, postData, deleteResource } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 import SimpleItemTable from './SimpleItemTable';
 import TransparentTextInputOverlay from './TransparentTextInputOverlay';
@@ -73,6 +73,35 @@ function AdminOrgUnitsPanel() {
         
     }
 
+    function deleteOU() {
+        const url = `/api/org/${selectedOrg}`;
+        deleteResource(url, handleDeleteOrgResult);
+    }
+
+    function handleDeleteOrgResult(response) {
+        if (response.status == 200) {
+            //Toast success message
+            const newOrgs = Array.from(orgs);
+            let position = -1;
+            for (let i = 0; i < newOrgs.length; ++i) {
+                if (newOrgs[i]._id === selectedOrg) {
+                    position = i;
+                    break;
+                }
+            }
+            newOrgs.splice(position, 1);
+            setSelectedOrg(null);
+            setSelectedDept(null);
+            setLoadedDepts(false);
+            setOrgs(newOrgs);
+        } else {
+            //Toast failure.
+            //Someone else probably deleted the OU before this user so refresh the list
+            setSelectedOrg(null);
+            setLoadedOrgs(false);
+        }
+    }
+
     const overlay = [];
     if (overLayDisplayed) {
         overlay.push(<TransparentTextInputOverlay key="overlay"
@@ -88,7 +117,7 @@ function AdminOrgUnitsPanel() {
         orgUnitButtons.push(<button key="add-ou-button" onClick={addOrgUnitButtonPress}>Add OU</button>);
         if (selectedOrg) {
             orgUnitButtons.push(<button key="rename-ou-button">Rename OU</button>);
-            orgUnitButtons.push(<button key="delete-ou-button">Delete OU</button>);
+            orgUnitButtons.push(<button key="delete-ou-button" onClick={deleteOU}>Delete OU</button>);
         }
     }
     

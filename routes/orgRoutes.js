@@ -9,5 +9,6 @@ const OrgController = require('../controllers/OrgController');
 orgRouter.get('/', OrgController.getListOfAllOrgs);
 orgRouter.get('/:orgID', OrgController.getListOfDepts);
 orgRouter.post('/', OrgController.addNewOrg);
+orgRouter.delete('/:orgID', OrgController.deleteOrg);
 
 module.exports = orgRouter;

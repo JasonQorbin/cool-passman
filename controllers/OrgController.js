@@ -47,8 +47,18 @@ async function addNewOrg(request, response) {
     }
 }
 
+async function deleteOrg( request, response) {
+    const result = await orgModel.deleteOne({_id : request.params.orgID});
+    if (result.deletedCount == 1) {
+        response.status(StatusCodes.SUCCESS).end();
+    } else {
+        response.status(StatusCodes.NOT_FOUND).end();
+    }
+}
+
 module.exports = {
     getListOfAllOrgs,
     getListOfDepts,
-    addNewOrg
+    addNewOrg,
+    deleteOrg
 }

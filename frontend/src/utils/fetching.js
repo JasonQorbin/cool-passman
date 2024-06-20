@@ -53,3 +53,17 @@ export function postData(url, bodyContent, responseCallback) {
             responseCallback(response);
         });
 }
+
+export function deleteResource(url, responseCallback) {
+    const fetchProperties = {
+        method : 'DELETE',
+        headers : {
+            "Content-Type" : "application/json"
+        },
+    }
+    fetch(url, fetchProperties)
+        .then( response => {
+            responseCallback(response);
+        });
+
+}
