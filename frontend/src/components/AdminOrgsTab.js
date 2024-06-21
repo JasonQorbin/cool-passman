@@ -21,16 +21,6 @@ function AdminOrgUnitsPanel() {
 
     const [overLayDisplayed, setOverlayDisplay] = useState(false);
 
-    if (!loadedOrgs && !loadingOrgs) {
-        getData('/api/org', setOrgs, setLoadingOrgs, setLoadedOrgs, setErrorMsg, setErrorState)
-            .catch( () => console.log("Error while fetching OU data"));
-    }
-
-    if ( loadedOrgs && selectedOrg && !loadingDepts && !loadedDepts ) {
-        getData(`/api/org/${selectedOrg}`, setDepts, setLoadingDepts, setLoadedDepts, setErrorMsg, setErrorState)
-            .catch( () => console.log("Error while fetching department data"));
-    }
-
     function getSelectedOrg(){
         if (orgs.length == 0) {
             return null;
@@ -47,11 +37,19 @@ function AdminOrgUnitsPanel() {
         setSelectedDept(null);
         setLoadedDepts(false);
     }
-
+    
+    /**
+      * Updates state to stop the transparent input layer from dislaying, effectively cancelling whatever 
+      * operation/workflow you were busy with.
+      */
     function cancelOverlay() {
         setOverlayDisplay(null);
     }
-
+    
+    /**
+      * Callback function for the "Add OU" button.
+      * Displays the input layer for the user to provide the name of the new OU.
+      */
     function addOrgUnitButtonPress() {
         setOverlayDisplay({
             title: "New OU Name:",
@@ -60,13 +58,19 @@ function AdminOrgUnitsPanel() {
             cancelCallback : cancelOverlay
         })
     }
-
+    
+    /**
+      * Triggers a POST request to the server to create a new OU.
+      */
     function postNewOU(newName) {
         setOverlayDisplay(null);
         const objectToPost = { name : newName };
         postData('/api/org', objectToPost, handleAddOrgResult);
     }
-
+    
+    /**
+      * Handles the server's response to a request to create a new OU
+      */
     function handleAddOrgResult(response) {
         if (response.status == 201) {
             setSelectedDept(null);
@@ -83,7 +87,11 @@ function AdminOrgUnitsPanel() {
         }
         
     }
-
+    
+    
+    /* Callback function for the "Rename OU" button.
+     * Displays the input layer for the user to provide the new name OU.
+     */
     function renameOrgUnitButtonPress() {
         setOverlayDisplay({
             title: "Rename OU:",
@@ -93,12 +101,20 @@ function AdminOrgUnitsPanel() {
         })
     }
 
+    /**
+      * Triggers a PATCH request to the server to rename the selected OU.
+      */
     function patchOrgName(newName) {
-        setOverlayDisplay(null);
-        const objectToSend = { name : newName };
-        patchData(`/api/org/${selectedOrg}`, objectToSend, handleRenameOrgResult);
+        if (getSelectedOrg.name !== newName) {
+            setOverlayDisplay(null);
+            const objectToSend = { name : newName };
+            patchData(`/api/org/${selectedOrg}`, objectToSend, handleRenameOrgResult);
+        }
     }
 
+    /**
+      * Handles the server's response to a request to rename the selected OU.
+      */
     function handleRenameOrgResult(response) {
         switch (response.status) {
             case 200:
@@ -136,12 +152,18 @@ function AdminOrgUnitsPanel() {
         }
 
     }
-
+    
+    /**
+      * Triggers a DELETE request to the server to delete the selected OU.
+      */
     function deleteOU() {
         const url = `/api/org/${selectedOrg}`;
         deleteResource(url, handleDeleteOrgResult);
     }
 
+    /**
+      * Handles the server's response to a request to delete the selected OU.
+      */
     function handleDeleteOrgResult(response) {
         if (response.status == 200) {
             //Toast success message
@@ -166,6 +188,20 @@ function AdminOrgUnitsPanel() {
         }
     }
 
+    // Load data from the server if necessary
+    
+    if (!loadedOrgs && !loadingOrgs) {
+        getData('/api/org', setOrgs, setLoadingOrgs, setLoadedOrgs, setErrorMsg, setErrorState)
+            .catch( () => console.log("Error while fetching OU data"));
+    }
+
+    if ( loadedOrgs && selectedOrg && !loadingDepts && !loadedDepts ) {
+        getData(`/api/org/${selectedOrg}`, setDepts, setLoadingDepts, setLoadedDepts, setErrorMsg, setErrorState)
+            .catch( () => console.log("Error while fetching department data"));
+    }
+
+    //Create the transparent input overlay if needed.
+
     const overlay = [];
     if (overLayDisplayed) {
         overlay.push(<TransparentTextInputOverlay key="overlay"
@@ -175,6 +211,8 @@ function AdminOrgUnitsPanel() {
             closeCallback = {cancelOverlay}
         />)
     }
+    
+    //Populate the buttons above the Org Unit table.
 
     const orgUnitButtons = [];
     if (loadedOrgs && !errorState) {
@@ -185,6 +223,8 @@ function AdminOrgUnitsPanel() {
         }
     }
     
+    //Populate the buttons above the Department table
+
     const deptButtons = [];
     if (loadedDepts && !errorState) {
         deptButtons.push(<button key="add-dept-button">Add Dept</button>);
@@ -195,6 +235,7 @@ function AdminOrgUnitsPanel() {
     }
 
     //Progressively display the tables as the user clicks through and the elements get loaded from the server.
+
     const tableGroups = [];
     if (loadingOrgs || loadedOrgs) {
         if(loadingOrgs) {
