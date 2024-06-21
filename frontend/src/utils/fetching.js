@@ -54,6 +54,20 @@ export function postData(url, bodyContent, responseCallback) {
         });
 }
 
+export function patchData(url, bodyContent, responseCallback) {
+    const fetchProperties = {
+        method : 'PATCH',
+        headers : {
+            "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(bodyContent)
+    }
+    fetch(url, fetchProperties)
+        .then( response => {
+            responseCallback(response);
+        });
+}
+
 export function deleteResource(url, responseCallback) {
     const fetchProperties = {
         method : 'DELETE',

@@ -7,6 +7,7 @@ const UNAUTHORISED           = 401; //The requestor could not be authenticated. 
 
 const FORBIDDEN              = 403; //The requester was positively authenticated but is not authorized to access the resource.
                                     //A retry will not change the outcome.
+/** The requested resource could not be found. */
 const NOT_FOUND              = 404;
 const CONFLICT               = 409; //The requested change conflicts with the current state of the server.
 const GONE                   = 410; //The requested resource has been pernamently deleted.

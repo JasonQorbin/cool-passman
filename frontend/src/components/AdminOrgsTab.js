@@ -1,5 +1,5 @@
 import '../styles/AdminOrgsTab.css';
-import { getData, postData, deleteResource } from '../utils/fetching';
+import { getData, postData, patchData, deleteResource } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 import SimpleItemTable from './SimpleItemTable';
 import TransparentTextInputOverlay from './TransparentTextInputOverlay';
@@ -29,6 +29,17 @@ function AdminOrgUnitsPanel() {
     if ( loadedOrgs && selectedOrg && !loadingDepts && !loadedDepts ) {
         getData(`/api/org/${selectedOrg}`, setDepts, setLoadingDepts, setLoadedDepts, setErrorMsg, setErrorState)
             .catch( () => console.log("Error while fetching department data"));
+    }
+
+    function getSelectedOrg(){
+        if (orgs.length == 0) {
+            return null;
+        }
+        for (const org of orgs){
+            if (org._id == selectedOrg){
+                return org;
+            }
+        }
     }
     
     function selectNewOrg(newOrg) {
@@ -71,6 +82,59 @@ function AdminOrgUnitsPanel() {
             //Toast showing error message
         }
         
+    }
+
+    function renameOrgUnitButtonPress() {
+        setOverlayDisplay({
+            title: "Rename OU:",
+            defaultValue : getSelectedOrg().name,
+            callback : patchOrgName,
+            cancelCallback : cancelOverlay
+        })
+    }
+
+    function patchOrgName(newName) {
+        setOverlayDisplay(null);
+        const objectToSend = { name : newName };
+        patchData(`/api/org/${selectedOrg}`, objectToSend, handleRenameOrgResult);
+    }
+
+    function handleRenameOrgResult(response) {
+        switch (response.status) {
+            case 200:
+                response.json()
+                    .then( data => {
+                        //Todo: Toast showing success
+                        const newOrgs = Array.from(orgs);
+                        for (let i=0; i < newOrgs.length; i++) {
+                            if (newOrgs[i]._id == data._id) {
+                                newOrgs[i] = data;
+                                break;
+                            }
+                        }
+                        setOrgs(newOrgs);
+                    });
+                break;
+            
+            case 500:
+                //Toast server error
+                console.log("Server error");
+                break;
+
+            case 404:
+                //Record not found on the server. Refresh the local cache
+                //Toast refesh.
+                setSelectedDept(null);
+                setSelectedOrg(null);
+                setLoadedOrgs(false);
+                break;
+
+            case 500:
+                //Toast server error
+                console.log("Server error");
+                break;
+        }
+
     }
 
     function deleteOU() {
@@ -116,7 +180,7 @@ function AdminOrgUnitsPanel() {
     if (loadedOrgs && !errorState) {
         orgUnitButtons.push(<button key="add-ou-button" onClick={addOrgUnitButtonPress}>Add OU</button>);
         if (selectedOrg) {
-            orgUnitButtons.push(<button key="rename-ou-button">Rename OU</button>);
+            orgUnitButtons.push(<button key="rename-ou-button" onClick={renameOrgUnitButtonPress}>Rename OU</button>);
             orgUnitButtons.push(<button key="delete-ou-button" onClick={deleteOU}>Delete OU</button>);
         }
     }
