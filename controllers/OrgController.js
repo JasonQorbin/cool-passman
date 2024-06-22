@@ -6,7 +6,8 @@
  */
 
 const { orgModel } = require('../models/orgs');
-const StatusCodes = require('../utils/http-codes');  
+const { userModel } = require('../models/users');
+const StatusCodes = require('../utils/http-codes');
 
 
 async function getListOfAllOrgs(request, response) {
@@ -34,7 +35,6 @@ async function addNewOrg(request, response) {
     const newOrg = new orgModel( {name : request.body.name });
     const savedOrg = await newOrg.save();
     if (savedOrg === newOrg) {
-        console.log(savedOrg);
         response.status(StatusCodes.CREATED)
                 .send(savedOrg);
     } else {
@@ -74,10 +74,126 @@ async function renameOrg( request, response ) {
             .send(updatedDoc);
 }
 
+async function addNewDept(request, response) {
+    if (!request.body.hasOwnProperty('name')) {
+        response.status(StatusCodes.BAD_REQUEST)
+                .end();
+        return;
+    }
+
+    const orgToChange = await orgModel.findById(request.params.orgID);
+    if (orgToChange == null) {
+        response.status(StatusCodes.NOT_FOUND)
+                .end();
+        return;
+    }
+    orgToChange.departments.push({ name : request.body.name, repo : [] });
+    const savedDoc = await orgToChange.save();
+
+    if (savedDoc === orgToChange) {
+        response.status(StatusCodes.CREATED)
+                .send(savedDoc);
+    } else {
+        response.status(StatusCodes.CONFLICT)
+                .end();
+    }
+
+}
+
+async function renameDept(request, response) {
+    if (!request.body.hasOwnProperty('name')) {
+        response.status(StatusCodes.BAD_REQUEST)
+                .end();
+        return;
+    }
+    
+    const orgToChange = await orgModel.findById(request.params.orgID)
+    if (orgToChange == null) {
+        response.status(StatusCodes.NOT_FOUND)
+                .end();
+        return;
+    }
+
+    let foundDept = false;
+    for (let i = 0; i < orgToChange.departments.length; ++i) {
+        if (orgToChange.departments[i]._id.toString() === request.params.deptID) {
+            orgToChange.departments[i].name = request.body.name;
+            foundDept = true;
+        }
+    }
+
+    if (!foundDept) {
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const savedDoc = await orgToChange.save();
+
+    if (savedDoc === orgToChange) {
+        response.status(StatusCodes.SUCCESS)
+                .send(savedDoc);
+    } else {
+        response.status(StatusCodes.CONFLICT)
+                .end();
+    }
+}
+
+
+async function deleteDept(request, response) {
+    const orgToChange = await orgModel.findById(request.params.orgID)
+    if (orgToChange == null) {
+        response.status(StatusCodes.NOT_FOUND)
+                .end();
+        return;
+    }
+    
+    removeDepartmentFromAllUsers(request.params.orgID, request.params.deptID);
+
+    let positionToDelete = -1;
+    
+    for (let i = 0; i < orgToChange.departments.length; ++i) {
+        if (orgToChange.departments[i]._id.toString() == request.params.deptID) {
+            positionToDelete = i;
+        }
+    }
+    
+    if ( positionToDelete == -1 ) {
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    orgToChange.departments.splice(positionToDelete,1);
+    await orgToChange.save();
+    
+    response.status(StatusCodes.SUCCESS).end();
+    
+
+}
+
+async function removeDepartmentFromAllUsers(orgID, deptID) {
+    usersToChange = await userModel.find({'authorised_repos.orgID': orgID, 'authorised_repos.deptID': deptID });
+    console.log(`Found ${usersToChange.length} users to revoke`);
+
+    for (let i = 0; i < usersToChange.length; ++i) {
+        for (let j = 0; j < usersToChange[i].authorised_repos.length; j++) {
+            if( usersToChange[i].authorised_repos[j].orgID == orgID &&
+                usersToChange[i].authorised_repos[j].deptID == deptID) {
+                usersToChange[i].authorised_repos.splice(j,1);
+                await usersToChange[i].save();
+                break;
+            }
+        }
+    }
+}
+
+
 module.exports = {
     getListOfAllOrgs,
     getListOfDepts,
     addNewOrg,
     deleteOrg,
-    renameOrg
+    renameOrg,
+    addNewDept,
+    renameDept,
+    deleteDept
 }

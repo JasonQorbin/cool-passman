@@ -21,6 +21,13 @@ function AdminOrgUnitsPanel() {
 
     const [overLayDisplayed, setOverlayDisplay] = useState(false);
 
+    function invalidateCachedData() {
+        setLoadedOrgs(false);
+        setLoadedDepts(false);
+        setSelectedDept(null);
+        setSelectedDept(null);
+    }
+
     function getSelectedOrg(){
         if (orgs.length == 0) {
             return null;
@@ -29,6 +36,15 @@ function AdminOrgUnitsPanel() {
             if (org._id == selectedOrg){
                 return org;
             }
+        }
+    }
+
+    function getSelectedDept(){
+        if ( !selectedOrg || !selectedDept ) return null;
+        
+        const org = getSelectedOrg();
+        for (const dept of org.departments) {
+            if (dept._id == selectedDept) return dept;
         }
     }
     
@@ -73,15 +89,7 @@ function AdminOrgUnitsPanel() {
       */
     function handleAddOrgResult(response) {
         if (response.status == 201) {
-            setSelectedDept(null);
-            setSelectedOrg(null);
-            response.json()
-                .then( data => {
-                    //Todo: Toast showing success
-                    const newOrgs = Array.from(orgs);
-                    newOrgs.push(data);
-                    setOrgs(newOrgs);
-                });   
+            invalidateCachedData();
         } else {
             //Toast showing error message
         }
@@ -118,19 +126,7 @@ function AdminOrgUnitsPanel() {
     function handleRenameOrgResult(response) {
         switch (response.status) {
             case 200:
-                response.json()
-                    .then( data => {
-                        //Todo: Toast showing success
-                        const newOrgs = Array.from(orgs);
-                        for (let i=0; i < newOrgs.length; i++) {
-                            if (newOrgs[i]._id == data._id) {
-                                newOrgs[i] = data;
-                                break;
-                            }
-                        }
-                        setOrgs(newOrgs);
-                    });
-                break;
+                invalidateCachedData();
             
             case 500:
                 //Toast server error
@@ -140,9 +136,7 @@ function AdminOrgUnitsPanel() {
             case 404:
                 //Record not found on the server. Refresh the local cache
                 //Toast refesh.
-                setSelectedDept(null);
-                setSelectedOrg(null);
-                setLoadedOrgs(false);
+                invalidateCachedData();
                 break;
 
             case 500:
@@ -156,7 +150,7 @@ function AdminOrgUnitsPanel() {
     /**
       * Triggers a DELETE request to the server to delete the selected OU.
       */
-    function deleteOU() {
+    function deleteSelectedOU() {
         const url = `/api/org/${selectedOrg}`;
         deleteResource(url, handleDeleteOrgResult);
     }
@@ -167,27 +161,121 @@ function AdminOrgUnitsPanel() {
     function handleDeleteOrgResult(response) {
         if (response.status == 200) {
             //Toast success message
-            const newOrgs = Array.from(orgs);
-            let position = -1;
-            for (let i = 0; i < newOrgs.length; ++i) {
-                if (newOrgs[i]._id === selectedOrg) {
-                    position = i;
-                    break;
-                }
-            }
-            newOrgs.splice(position, 1);
-            setSelectedOrg(null);
-            setSelectedDept(null);
-            setLoadedDepts(false);
-            setOrgs(newOrgs);
+            invalidateCachedData();
         } else {
             //Toast failure.
             //Someone else probably deleted the OU before this user so refresh the list
-            setSelectedOrg(null);
-            setLoadedOrgs(false);
+            invalidateCachedData();
         }
     }
 
+    /**
+      * Callback function for the "Add Dept" button.
+      * Displays the input layer for the user to provide the name of the new department.
+      */
+    function addDeptButtonPress() {
+        setOverlayDisplay({
+            title: "New department name:",
+            defaultValue : "",
+            callback : postNewDept,
+            cancelCallback : cancelOverlay
+        })
+    }
+    
+    /**
+      * Triggers a POST request to the server to create a new department.
+      */
+    function postNewDept(newName) {
+        setOverlayDisplay(null);
+        const objectToPost = { name : newName };
+        postData(`/api/org/${selectedOrg}`, objectToPost, handleAddDeptResult);
+    }
+    
+    /**
+      * Handles the server's response to a request to create a new department
+      */
+    function handleAddDeptResult(response) {
+        if (response.status == 201) {
+            invalidateCachedData();
+        } else {
+            //Toast showing error message
+        }
+        
+    }
+    
+    
+    /* Callback function for the "Rename Dept" button.
+     * Displays the input layer for the user to provide the new department name.
+     */
+    function renameDeptButtonPress() {
+        setOverlayDisplay({
+            title: "Rename OU:",
+            defaultValue : getSelectedDept().name,
+            callback : patchDeptName,
+            cancelCallback : cancelOverlay
+        })
+    }
+
+    /**
+      * Triggers a PATCH request to the server to rename the selected OU.
+      */
+    function patchDeptName(newName) {
+        if (getSelectedDept.name !== newName) {
+            setOverlayDisplay(null);
+            const objectToSend = { name : newName };
+            patchData(`/api/org/${selectedOrg}/${selectedDept}`, objectToSend, handleRenameDeptResult);
+        }
+    }
+
+    /**
+      * Handles the server's response to a request to rename the selected OU.
+      */
+    function handleRenameDeptResult(response) {
+        switch (response.status) {
+            case 200:
+                invalidateCachedData();
+                break;
+            
+            case 500:
+                //Toast server error
+                console.log("Server error");
+                break;
+
+            case 404:
+                //Record not found on the server. Refresh the local cache
+                //Toast refesh.
+                invalidateCachedData();
+                break;
+
+            case 500:
+                //Toast server error
+                console.log("Server error");
+                break;
+        }
+
+    }
+    
+    /**
+      * Triggers a DELETE request to the server to delete the selected OU.
+      */
+    function deleteSelectedDept() {
+        const url = `/api/org/${selectedOrg}/${selectedDept}`;
+        deleteResource(url, handleDeleteDeptResult);
+    }
+
+    /**
+      * Handles the server's response to a request to delete the selected OU.
+      */
+    function handleDeleteDeptResult(response) {
+        if (response.status == 200) {
+            //Toast success message
+            invalidateCachedData();
+        } else {
+            //Toast failure.
+            //Someone else probably deleted the OU before this user so refresh the list
+            invalidateCachedData()
+        }
+    }
     // Load data from the server if necessary
     
     if (!loadedOrgs && !loadingOrgs) {
@@ -219,7 +307,7 @@ function AdminOrgUnitsPanel() {
         orgUnitButtons.push(<button key="add-ou-button" onClick={addOrgUnitButtonPress}>Add OU</button>);
         if (selectedOrg) {
             orgUnitButtons.push(<button key="rename-ou-button" onClick={renameOrgUnitButtonPress}>Rename OU</button>);
-            orgUnitButtons.push(<button key="delete-ou-button" onClick={deleteOU}>Delete OU</button>);
+            orgUnitButtons.push(<button key="delete-ou-button" onClick={deleteSelectedOU}>Delete OU</button>);
         }
     }
     
@@ -227,10 +315,10 @@ function AdminOrgUnitsPanel() {
 
     const deptButtons = [];
     if (loadedDepts && !errorState) {
-        deptButtons.push(<button key="add-dept-button">Add Dept</button>);
+        deptButtons.push(<button key="add-dept-button" onClick={addDeptButtonPress}>Add Dept</button>);
         if (selectedDept) {
-            deptButtons.push(<button key="rename-dept-button">Rename Dept</button>);
-            deptButtons.push(<button key="delete-dept-button">Delete Dept</button>);
+            deptButtons.push(<button key="rename-dept-button" onClick={renameDeptButtonPress}>Rename Dept</button>);
+            deptButtons.push(<button key="delete-dept-button" onClick={deleteSelectedDept}>Delete Dept</button>);
         }
     }
 
