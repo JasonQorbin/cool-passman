@@ -15,7 +15,7 @@ export default function SimpleItemTable(props) {
     });
 
     return (
-        <table>
+        <table className="simple-table">
             <thead>
                 <tr>
                     <th>{props.title}</th>

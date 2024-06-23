@@ -50,7 +50,7 @@ export function postData(url, bodyContent, responseCallback) {
     }
     fetch(url, fetchProperties)
         .then( response => {
-            responseCallback(response);
+            responseCallback(response, bodyContent);
         });
 }
 
@@ -64,7 +64,7 @@ export function patchData(url, bodyContent, responseCallback) {
     }
     fetch(url, fetchProperties)
         .then( response => {
-            responseCallback(response);
+            responseCallback(response, bodyContent);
         });
 }
 

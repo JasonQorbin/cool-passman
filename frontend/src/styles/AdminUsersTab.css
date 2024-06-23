@@ -1,0 +1,13 @@
+#admin-users-table {
+    border-collapse : collapse;
+    margin: 30px;
+}
+
+#admin-users-table th {
+    border : 1px black solid;
+}
+
+#admin-users-table td {
+    border : 1px black solid;
+    padding : 4px 10px;
+}

@@ -1,6 +1,6 @@
 import '../styles/AdminPanel.css';
-import AdminOrgUnitsPanel from './AdminOrgsTab'; 
-import AdminUsersPanel from './AdminUsersTab';
+import AdminOrgUnitsTab from './AdminOrgsTab'; 
+import AdminUsersTab from './AdminUsersTab';
 import { useState } from 'react';
 
 function AdminPanel(){
@@ -13,13 +13,13 @@ function AdminPanel(){
 
     switch (activePanel) {
         case "Org Units":
-            chosenPanel.push(<AdminOrgUnitsPanel key="orgs"/>);
+            chosenPanel.push(<AdminOrgUnitsTab key="orgs"/>);
             break;
         case "Users":
-            chosenPanel.push(<AdminUsersPanel key="users" />);
+            chosenPanel.push(<AdminUsersTab key="users" />);
             break;
         default:
-            chosenPanel.push(<AdminOrgUnitsPanel key="orgs" />);
+            chosenPanel.push(<AdminOrgUnitsTab key="orgs" />);
     }
 
     return (

@@ -1,20 +1,12 @@
 const jwt = require('jsonwebtoken');
 const { userModel } = require('../models/users');
-const createStatsCollector = require('mocha/lib/stats-collector');
+const StatusCodes = require('../utils/http-codes');
 
 //JWT Secret:
 //It's ok to just use a default here because we've already checked that the variables have been setup properly in
 //index.js and would have ended the process we were trying to run in production without a proper secret. This 
 //allows us to use a proper secret for testing if we have one and continue testing with a default if not.
 let jwtSecret = process.env.TOKEN_SECRET || "Testing_Secret";
-
-
-//Status Codes
-const SUCCESS       = 200;
-const CREATED       = 201;
-const BAD_REQUEST   = 400;
-const UNAUTHORISED  = 401;
-const FORBIDDEN     = 403;
 
 /**
  * Signs the given payload with the secret using HMAC + SHA256 and returns the token.
@@ -43,7 +35,7 @@ function createTokenFromUser(userDoc) {
  * @param response The response object to send back.
  */
 function authenticationFailed(response) {
-    response.status(FORBIDDEN)
+    response.status(StatusCodes.FORBIDDEN)
             .send({error : "Authentication failed"})
             .end();
 }
@@ -55,7 +47,7 @@ function authenticationFailed(response) {
  * @param response The response object to send back.
  */
 function authenticationInvalid(response) {
-    response.status(UNAUTHORISED)
+    response.status(StatusCodes.UNAUTHORISED)
             .send({error : "Authentication failed"})
             .end();
 }
@@ -87,28 +79,27 @@ async function authenticateUser( request, response ) {
     }
     
     const generatedToken = createTokenFromUser(userDoc);
-    response.status(SUCCESS)
+    response.status(StatusCodes.SUCCESS)
             .send({ "token" : generatedToken})
             .end();
 }
 
 async function registerNewUser( request, response ) {
-    const haveRequiredFields = request.body.hasOwnProperty('firstname') &&   
-        request.body.hasOwnProperty('lastname') && 
+    const haveRequiredFields = request.body.hasOwnProperty('firstName') &&   
+        request.body.hasOwnProperty('lastName') && 
         request.body.hasOwnProperty('email') && 
         request.body.hasOwnProperty('password');
 
     if (!haveRequiredFields) {
-        response.status(BAD_REQUEST)
-        .end();
+        response.status(StatusCodes.BAD_REQUEST).end();
         return;
     }
 
     const newUser = new userModel({
-        firstName:request.body.firstname,
-        lastName:request.body.lastname,
-        email:request.body.email,
-        password:request.body.password,
+        firstName : request.body.firstName,
+        lastName : request.body.lastName,
+        email : request.body.email,
+        password : request.body.password,
         authorised_repos: []
     });
 
@@ -116,13 +107,21 @@ async function registerNewUser( request, response ) {
         newUser.position = request.body.position;
     }
     
-    const savedUser = await newUser.save();
+    try {
+        const savedUser = await newUser.save();
+        const token = createTokenFromUser(savedUser);
 
-    const token = createTokenFromUser(savedUser);
-
-    response.status(CREATED)
-        .send({"token" : token })
-        .end();
+        response.status(StatusCodes.CREATED)
+            .send({"token" : token });
+    } catch (error) {
+        if (error.code == 11000) {
+            console.error("Duplicate key error:", error);
+            response.status(StatusCodes.CONFLICT).end();
+        } else {
+            console.error("Database error:", error);
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+        }
+    }
 }
 
 

@@ -1,19 +1,19 @@
-table {
+table.simple-table {
     border-collapse : collapse;
     margin : 20px;
 }
 
-th, td {
+table.simple-table th, table.simple-table td {
     border : 1px grey solid;
     padding : 5px;
     min-width : 300px;
 }
 
-tbody tr.selected {
+table.simple-table tbody tr.selected {
     background : lightsalmon;
 }
 
 
-tbody tr:hover {
+table.simple-table tbody tr:hover {
     background : lightpink;
 }

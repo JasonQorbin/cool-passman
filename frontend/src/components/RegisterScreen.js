@@ -1,30 +1,63 @@
 import "../styles/RegisterScreen.css";
+import { postData } from '../utils/fetching';
+import { useNavigate } from "react-router-dom";
 const requiredPasswordLength = 8;
 
-
-function validateForm(event) {
-    const passwordElement1 = document.getElementById("registration-password-field");
-    const passwordElement2 = document.getElementById("registration-password-confirmation-field");
+export default function RegisterScreen() {
     
-    console.log(`Field 1: ${passwordElement1.value}`);
-    console.log(`Field 2: ${passwordElement2.value}`);
-    if (passwordElement1.value !== passwordElement2.value) {
-        passwordElement2.setCustomValidity("Passwords don't match");
+    const navigate = useNavigate();
+
+    function validateFormAndSubmit(event) {
+        const firstNameField = document.getElementById("registration-firstname-field");
+        const lastNameField = document.getElementById("registration-lastname-field");
+        const positionField = document.getElementById("registration-title-field");
+        const emailField = document.getElementById("registration-email-field");
+
+        const passwordElement1 = document.getElementById("registration-password-field");
+        const passwordElement2 = document.getElementById("registration-password-confirmation-field");
         event.preventDefault();
-        passwordElement2.reportValidity();
-    } else {
+
+        if (passwordElement1.value !== passwordElement2.value) {
+            passwordElement2.setCustomValidity("Passwords don't match");
+            passwordElement2.reportValidity();
+        } else {
+            passwordElement2.setCustomValidity("");
+            const objectToSend = {
+                firstName : firstNameField.value,
+                lastName : lastNameField.value,
+                position : positionField.value,
+                email : emailField.value,
+                password : passwordElement1.value
+            };
+
+            sendRegisterRequestToServer(objectToSend);
+        }
+
+    }
+
+    function resetPasswordErrorState() {
+        const passwordElement2 = document.getElementById("registration-password-confirmation-field");
         passwordElement2.setCustomValidity("");
     }
-        
-}
 
-function resetPasswordErrorState() {
-    const passwordElement2 = document.getElementById("registration-password-confirmation-field");
-    passwordElement2.setCustomValidity("");
-}
+    function sendRegisterRequestToServer(userToPost) {
+        const url = '/api/users';
+        postData(url, userToPost, handleRegisterResponse);
+    }
 
+    function handleRegisterResponse(response, postedObject) {
+        if (response.status == 201) {
+            //Save the token to session data. Then redirect to the home page.
+            response.json()
+                .then((data) => {
+                    console.log(`Token to save ${data.token}`);
+                    navigate('/');
+                })
+        } else {
+            //Toast error message
+        }
+    }
 
-export default function RegisterScreen(props) {
     return (
         <div className="centre-container">
             <div id="registration-content-wrapper">
@@ -34,10 +67,10 @@ export default function RegisterScreen(props) {
                     administrator assigns your account to your respective department will you be
                     able to view and create records.
                 </p>
-                <form id="registration-form" onSubmit={validateForm}>
+                <form id="registration-form" onSubmit={validateFormAndSubmit}>
                     <div className="form-row">
                         <span className="registration-label-wrapper">
-                            <label htmlFor="registration-email-field">First names:</label>
+                            <label htmlFor="registration-firstname-field">First names:</label>
                         </span>
                         <input type="text"
                             id="registration-firstname-field"
@@ -48,7 +81,7 @@ export default function RegisterScreen(props) {
                     </div>
                     <div className="form-row">
                         <span className="registration-label-wrapper">
-                            <label htmlFor="registration-email-field">Last name:</label>
+                            <label htmlFor="registration-lastname-field">Last name:</label>
                         </span>
                         <input type="text"
                             id="registration-lastname-field"
@@ -68,7 +101,9 @@ export default function RegisterScreen(props) {
                         />
                     </div>
                     <div className="form-row">
-                        <span className="registration-label-wrapper"><label htmlFor="registration-email-field">Email:</label></span>
+                        <span className="registration-label-wrapper">
+                            <label htmlFor="registration-email-field">Email:</label>
+                        </span>
                         <input type="email" 
                             id="registration-email-field"
                             className="registration-field"
