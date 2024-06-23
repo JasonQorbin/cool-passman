@@ -1,13 +1,13 @@
 import '../styles/SideBar.css'
+import { Link } from 'react-router-dom';
 
 function SideBar() {
     return (
             <aside id="home-screen-sidebar">
                 <ul id="sidebar-items-list">
-                    <li><a href="#" className="sidebar-item">Home</a></li>
-                    <li><a href="#" className="sidebar-item">My Repositories</a></li>
-                    <li><a href="#" className="sidebar-item">My Profile</a></li>
-                    <li><a href="#" className="sidebar-item">Admin Panel</a></li>
+                    <li><Link to="/repos" className="sidebar-item">My Repositories</Link></li>
+                    <li><Link to="/profile" className="sidebar-item">My Profile</Link></li>
+                    <li><Link to="/admin" className="sidebar-item">Admin Panel</Link></li>
                 </ul>
             </aside>
         

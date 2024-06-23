@@ -6,6 +6,8 @@ import LoginScreen from "./components/LoginScreen";
 import RegisterScreen from "./components/RegisterScreen";
 import HomeScreen from "./components/HomeScreen";
 import AdminPanel from "./components/AdminPanel";
+import RepoScreen from "./components/RepoScreen";
+import ProfileScreen from "./components/ProfileScreen";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/" element={<MainPageLayout />}>
                 <Route path="/home" element={<HomeScreen />} />
+                <Route path="/repos" element={<RepoScreen />} />
+                <Route path="/profile" element={<ProfileScreen />} />
                 <Route path="/admin" element={<AdminPanel />} />
             </Route>
         </Routes>
