@@ -1,7 +1,7 @@
 const { userModel } = require("../models/users");
 const StatusCodes = require('../utils/http-codes');
 
-function santizeUser(user) {
+function sanitizeUser(user) {
     if (user.hasOwnProperty('password')) {
         delete user.password;
     }
@@ -18,7 +18,7 @@ function requestHasRequiredUserFields(request) {
 async function getListOfAllUsers( request, response ) {
     allUsers = await userModel.find({});
     usersWithoutPassword = allUsers.map((user) => {
-        return santizeUser(user);
+        return sanitizeUser(user);
     });
 
     response.status(StatusCodes.SUCCESS)
@@ -55,7 +55,7 @@ async function overwriteUserProfile ( request, response ) {
     oldProfile.replace(objectToApply);
     const savedUser = await oldProfile.save();
 
-    response.status(StatusCodes.SUCCESS).send(santizeUser(savedUser));
+    response.status(StatusCodes.SUCCESS).send(sanitizeUser(savedUser));
 }
 
 async function changeUserAccessLevel ( request, response ) {
@@ -69,7 +69,7 @@ async function changeUserAccessLevel ( request, response ) {
     const savedUser = await userToChange.save();
     
     if (savedUser === userToChange) {
-        response.status(StatusCodes.SUCCESS).send(savedUser);
+        response.status(StatusCodes.SUCCESS).send(sanitizeUser(savedUser));
     } else  {
         response.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
     }
@@ -79,7 +79,7 @@ async function deleteUser ( request, response ) {
     const deletedDocument = await userModel.findByIdAndDelete(request.params.userID);
 
     if ( deletedDocument ) {
-        response.status(StatusCodes.SUCCESS).send(santizeUser(deletedDocument));
+        response.status(StatusCodes.SUCCESS).send(sanitizeUser(deletedDocument));
     } else {
         response.status(StatusCodes.NOT_FOUND).end();
     }

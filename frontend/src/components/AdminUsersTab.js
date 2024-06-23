@@ -10,6 +10,20 @@ export default function AdminUsersTab(props) {
     const [errorState, setErrorState] = useState(false);
     const [errorMsg, setErrorMsg] = useState(false);
     
+    /**
+      * Helper function that searches for the user that matches the given id string and returns that user object. 
+      *
+      * @param {string} id - The id string of the user being searched for.
+      * @returns {Object} - The user from the users array.
+      */
+    function getUserFromID(id) {
+        for (const user of users) {
+            if (user._id === id) {
+                return user;
+            }
+        }
+    }
+
     function deleteUserButtonPress(event) {
         deleteResource(`/api/users/${event.target.value}`, handleDeleteResponse);
     }
@@ -37,7 +51,41 @@ export default function AdminUsersTab(props) {
         }
     }
 
+    function increaseAccessLevel(event) {
+        const user = getUserFromID(event.target.value);
+        const newRole = user.role === 'manager' ? 'admin' : 'manager';
 
+        const objectToSend = { role: newRole};
+        patchData(`/api/users/${user._id}`, objectToSend, handleRoleChangeResponse);
+    }
+
+
+    function decreaseAccessLevel(event) {
+        const user = getUserFromID(event.target.value);
+        const newRole = user.role === 'manager' ? 'user' : 'manager';
+
+        const objectToSend = { role: newRole};
+        patchData(`/api/users/${user._id}`, objectToSend, handleRoleChangeResponse);
+    }
+
+    function handleRoleChangeResponse(response) {
+        if (response.status === 200) {
+            response.json().then( data => {
+                const newUsers = Array.from(users);
+                for (const user of newUsers) {
+                    if (user._id === data._id) {
+                        user.role = data.role;
+                        break;
+                    }
+                }
+                setUsers(newUsers);
+            });
+        } else {
+            //Toast the error message.
+        }
+    }
+
+    
     // Load data from the server if necessary
     
     if (!loaded && !loading) {
@@ -48,12 +96,18 @@ export default function AdminUsersTab(props) {
     const tableRows = users.map( (user) => {
         const accessButtons = [];
         if (user.role !== "admin") {
-            accessButtons.push(<td key={user._id + "_inc"} className="button-column"><button>Inc Access level</button></td>);
+            accessButtons.push(
+                <td key={user._id + "_inc"} className="button-column">
+                    <button onClick={increaseAccessLevel} value={user._id}>Inc Access level</button>
+                </td>);
         } else {
             accessButtons.push(<td key={user._id + "_inc"} className="button-column"></td>);
         }
         if (user.role !== "user") {
-            accessButtons.push(<td key={user._id + "_dec"} className="button-column"><button>Dec Access level</button></td>);
+            accessButtons.push(
+                <td key={user._id + "_dec"} className="button-column">
+                    <button onClick={decreaseAccessLevel} value={user._id}>Dec Access level</button>
+                </td>);
         } else {
             accessButtons.push(<td key={user._id + "_dec"} className="button-column"></td>);
         }
