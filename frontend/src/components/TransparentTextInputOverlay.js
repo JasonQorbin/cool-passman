@@ -18,7 +18,8 @@ export default function TransparentTextInputOverlay(props) {
                         <input
                             id="text-input-field"
                             type="text"
-                            defaultValue={props.defaultValue} 
+                            defaultValue={props.defaultValue}
+                            required
                         />
                         <div className="form-row">
                             <input type="submit" value="Submit" />
