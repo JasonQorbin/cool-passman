@@ -10,6 +10,7 @@ const helmet = require('helmet');
 //Routers
 const authRouter = require('./routes/loginRoutes');
 const orgRouter = require('./routes/orgRoutes');
+const userRouter = require('./routes/userRoutes');
 //Custom middleware
 const { requestLogging } = require('./middleware/logging');
 //Database
@@ -36,6 +37,7 @@ app.get('/', (request, response) => {
     response.status(200).send("Hello World!!!").end();
 });
 
+app.use('/api/users', userRouter);
 app.use('/api/org',orgRouter);
 app.use('/api', authRouter);
 
