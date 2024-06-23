@@ -63,7 +63,7 @@ export default function AdminUsersTab(props) {
                     <tr key={user._id}>
                         <td>{user.firstName} {user.lastName}</td>
                         <td>{user.email}</td>
-                        <td>{user.jobTitle}</td>
+                        <td className="title-column">{user.position}</td>
                         <td className="role-column">{user.role}</td>
                         {accessButtons}
                         <td className="button-column"><button value={user._id} onClick={deleteUserButtonPress}>Delete User</button></td>

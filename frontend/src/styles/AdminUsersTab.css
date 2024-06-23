@@ -11,3 +11,18 @@
     border : 1px black solid;
     padding : 4px 10px;
 }
+
+#admin-users-table td.button-column {
+    width : 110px;
+    text-align : center;
+}
+
+#admin-users-table td.role-column {
+    width : 60px;
+    text-align : center;
+}
+
+#admin-users-table td.title-column {
+    min-width : 60px;
+    text-align : center;
+}
