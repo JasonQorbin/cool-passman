@@ -13,5 +13,7 @@ userRouter.put('/:userID', UserController.overwriteUserProfile);
 userRouter.patch('/:userID', UserController.changeUserAccessLevel);
 userRouter.delete('/:userID', UserController.deleteUser);
 
+//Temporary routes for testing
+userRouter.get('/random', UserController.getArbitraryUser);
 
 module.exports = userRouter;

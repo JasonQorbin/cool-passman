@@ -85,9 +85,26 @@ async function deleteUser ( request, response ) {
     }
 }
 
+/**
+  * Temporary function for testing the user profile page.
+  * 
+  * Retrieves an arbitrary user record from the database and sendds it back.
+  *
+  */
+async function getArbitraryUser( request, response ) {
+    const user = await userModel.findOne({});
+
+    if (!user) {
+        response.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    } else {
+        response.status(StatusCodes.SUCCESS).send(sanitizeUser(user));
+    }
+}
+
 module.exports = {
     getListOfAllUsers,
     overwriteUserProfile,
     changeUserAccessLevel,
-    deleteUser
+    deleteUser,
+    getArbitraryUser
 }
