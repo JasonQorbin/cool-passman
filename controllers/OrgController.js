@@ -7,6 +7,7 @@
 
 const { orgModel } = require('../models/orgs');
 const { userModel } = require('../models/users');
+const { verifyAndDecodeToken } = require('../controllers/AuthController');
 const StatusCodes = require('../utils/http-codes');
 
 
@@ -29,6 +30,27 @@ async function getListOfDepts(request, response) {
     response.status(StatusCodes.SUCCESS)
             .send(org.departments);
      
+}
+
+/**
+  * Returns all the repositories that the current user is authorised to see/change.
+  *
+  * Expects a valid token in the request body with a list of the authorised repos to fetch in the payload..
+  */
+async function getRepos( request, response ) {
+    if (!request.body.hasOwnProperty('token')) {
+        response.status(StatusCodes.UNAUTHORISED).end();
+        return;
+    }
+
+    const tokenPayload = verifyAndDecodeToken(request.body.token);
+
+    console.log(tokenPayload);
+
+    const repos = tokenPayload.repos;
+
+
+
 }
 
 async function addNewOrg(request, response) {
