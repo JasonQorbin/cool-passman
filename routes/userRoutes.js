@@ -8,6 +8,7 @@ const AuthController = require('../controllers/AuthController');
 
 //Org Units
 userRouter.get('/', UserController.getListOfAllUsers);
+userRouter.get('/self', UserController.getSelf);
 userRouter.post('/', AuthController.registerNewUser);
 userRouter.put('/:userID', UserController.overwriteUserProfile);
 userRouter.patch('/:userID', UserController.changeUserAccessLevel);

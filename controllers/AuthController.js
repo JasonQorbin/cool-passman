@@ -24,8 +24,7 @@ function getToken(payload) {
 
 function createTokenFromUser(userDoc) {
     const authorisedEntities = userDoc.authorised_repos;
-    authorisedEntities.push(userDoc._id);
-    const payload = { keychain : authorisedEntities, role : userDoc.role };
+    const payload = { _id:userDoc._id, keychain : authorisedEntities, role : userDoc.role };
     return getToken(payload);
 }
 
@@ -77,7 +76,7 @@ async function authenticateUser( request, response ) {
         authenticationFailed(response);
         return;
     }
-    console.log(userDoc);
+    
     const generatedToken = createTokenFromUser(userDoc);
     response.status(StatusCodes.SUCCESS)
             .send({ "token" : generatedToken})

@@ -1,9 +1,9 @@
 import "../styles/LoginScreen.css";
-import { postData } from '../utils/fetching';
+import { getData, postData } from '../utils/fetching';
 import { sessionTokenKey } from '../utils/constants';
 import { useNavigate } from 'react-router-dom';
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
     const navigate = useNavigate();
 
     function handleLogin(event) {
@@ -17,9 +17,14 @@ export default function LoginScreen() {
     }
 
     function handleLoginResponse(response, objectSent) {
-        if (response.status == 200) {
+        if (response.status === 200) {
             response.json().then( body => {
                 sessionStorage.setItem(sessionTokenKey, body.token);
+
+                //After getting and caching the token, fetch the current user in order to display their name on the
+                //main page header.
+                getData('/api/users/self', props.setCurrentUser); //Todo: Handled errors on this GET operation.
+                
                 navigate('/');
             });
         } else {

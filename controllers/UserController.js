@@ -1,5 +1,6 @@
 const { userModel } = require("../models/users");
 const StatusCodes = require('../utils/http-codes');
+const { verifyAndDecodeToken } = require("./AuthController");
 
 function sanitizeUser(user) {
     if (user.hasOwnProperty('password')) {
@@ -23,6 +24,31 @@ async function getListOfAllUsers( request, response ) {
 
     response.status(StatusCodes.SUCCESS)
             .send(usersWithoutPassword);
+}
+
+async function getSelf( request, response ) {
+    const authHeader = request.headers.authorisation.split(' ');
+    if (authHeader.length != 2 || authHeader[0] !== "Bearer") {
+        response.status(StatusCodes.UNAUTHORISED).send({error: "Expected Authorisation header with 'Bearer <Token>'"});
+        return;
+    }
+    
+    let payload;
+
+    try {
+        payload = verifyAndDecodeToken(authHeader[1]);
+    } catch (error) {
+        console.log(`[BAD TOKEN] Received ${authHeader[1]}`);
+        response.status(StatusCodes.UNAUTHORISED).send({error: "Token not verified"});
+        return;
+    }
+    
+    const user = await userModel.findById(payload._id);
+    if (!user) {
+        response.status(StatusCodes.NOT_FOUND).end();
+    } else {
+        response.status(StatusCodes.SUCCESS).send(user);
+    }
 }
 
 async function overwriteUserProfile ( request, response ) {
@@ -106,5 +132,6 @@ module.exports = {
     overwriteUserProfile,
     changeUserAccessLevel,
     deleteUser,
+    getSelf,
     getArbitraryUser
 }

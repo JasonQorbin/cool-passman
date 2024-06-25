@@ -1,9 +1,23 @@
 // The same pattern is used for fetching data from the server repeatedly so those functions are placed here.
 
+import { sessionTokenKey } from "./constants";
+
 export function getData(url, setData, setLoading, setLoaded, setErrorMsg, setErrorState) {
-    setLoading(true);
+    const fetchOptions = {
+        method : "GET",
+        headers : {}
+    }
+
+    const authToken = sessionStorage.getItem(sessionTokenKey);
+    if (authToken !== undefined) {
+        fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
+    }
+
+    if (setLoading !== undefined) {
+        setLoading(true);
+    }
     return new Promise( (resolve, reject) => {
-        fetch(url)
+        fetch(url, fetchOptions)
             .then( response => {
                 if (response.status == 403) {
                     throw new Error ("Forbidden");
@@ -19,21 +33,27 @@ export function getData(url, setData, setLoading, setLoaded, setErrorMsg, setErr
             .then( 
                 data => { 
                     setData(data);
-                    setLoading(false);
-                    setLoaded(true);
+                    if (setLoading !== undefined) {
+                        setLoading(false);
+                    }
+                    if (setLoaded !== undefined) {
+                        setLoaded(true);
+                    }
                     resolve(true);
                 },
-                error =>{ 
-                    if (error.message === "JSON.parse: unexpected character at line 1 column 1 of the JSON data") {
-                        setErrorMsg("JSON Parse error");
+                error =>{
+                    if (setErrorMsg !== undefined && setErrorState !== undefined) {
+                        if (error.message === "JSON.parse: unexpected character at line 1 column 1 of the JSON data") {
+                            setErrorMsg("JSON Parse error");
+                        }
+                        if (error.message === "Forbidden") {
+                            setErrorMsg("You do not have the correct privileges to view this");
+                        }
+                        if (error.message === "Not Found") {
+                            setErrorMsg("Not implemented yet...");
+                        }
+                        setErrorState(true);
                     }
-                    if (error.message === "Forbidden") {
-                        setErrorMsg("You do not have the correct privileges to few this");
-                    }
-                    if (error.message === "Not Found") {
-                        setErrorMsg("Not implemented yet...");
-                    }
-                    setErrorState(true);
                     reject(false);
                 }
             );
