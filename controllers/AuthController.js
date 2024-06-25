@@ -77,7 +77,7 @@ async function authenticateUser( request, response ) {
         authenticationFailed(response);
         return;
     }
-    
+    console.log(userDoc);
     const generatedToken = createTokenFromUser(userDoc);
     response.status(StatusCodes.SUCCESS)
             .send({ "token" : generatedToken})
