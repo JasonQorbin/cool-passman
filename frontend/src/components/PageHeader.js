@@ -2,6 +2,8 @@ import '../styles/PageHeader.css';
 
 function PageHeader(props) {
     const currentUserName = props.currentUser ? `${props.currentUser.firstName} ${props.currentUser.lastName}` : "";
+    
+    const showToastMessage = props.showToastMessage;
 
     return (
             <header id="page-header">
@@ -11,7 +13,7 @@ function PageHeader(props) {
                 </div>
                 <div className="right-right">
                     <p>Welcome, {currentUserName}</p>
-                    <p>Not you? <button>Log out</button></p>
+                    <p>Not you? <button onClick={()=>{showToastMessage("Better test", "Another test", 'primary')}}>Log out</button></p>
                 </div>
             </div>
                 <div id="page-header-divider"></div>
