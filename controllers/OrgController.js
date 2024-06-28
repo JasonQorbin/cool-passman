@@ -32,27 +32,6 @@ async function getListOfDepts(request, response) {
      
 }
 
-/**
-  * Returns all the repositories that the current user is authorised to see/change.
-  *
-  * Expects a valid token in the request body with a list of the authorised repos to fetch in the payload..
-  */
-async function getRepos( request, response ) {
-    if (!request.body.hasOwnProperty('token')) {
-        response.status(StatusCodes.UNAUTHORISED).end();
-        return;
-    }
-
-    const tokenPayload = verifyAndDecodeToken(request.body.token);
-
-    console.log(tokenPayload);
-
-    const repos = tokenPayload.repos;
-
-
-
-}
-
 async function addNewOrg(request, response) {
     const newOrg = new orgModel( {name : request.body.name });
     const savedOrg = await newOrg.save();
@@ -208,6 +187,182 @@ async function removeDepartmentFromAllUsers(orgID, deptID) {
     }
 }
 
+//==================================
+// Repo related funcntions
+//==================================
+
+/**
+  * Returns all the repositories that the current user is authorised to see/change.
+  *
+  * Expects a valid token in the request body with a list of the authorised repos to fetch in the payload..
+  */
+async function getRepos( request, response ) {
+    //No need to check that the header is well formed because this was already checked in middleware before this.
+    const token = request.headers.authorisation.split(' ')[1];
+
+    
+    let tokenPayload;
+
+    try {
+        tokenPayload = verifyAndDecodeToken(token);
+    } catch (error) {
+            console.log(`Token ${token} not verified`);
+            response.status(StatusCodes.UNAUTHORISED).end();
+            return;
+    }
+
+    
+    const repos = [];
+
+    for (const key of tokenPayload.keychain) {
+        
+        const org = await orgModel.findById(key.orgID);
+        if (!org) {
+            console.log(`Unable to find org unit ${key.orgID}`);
+            response.status(StatusCodes.NOT_FOUND).end();
+            return;
+        } else {
+            const department = org.departments.id(key.deptID);
+
+            if (!department) {
+                console.log(`Unable to find department ${key.deptID}`);
+                response.status(StatusCodes.NOT_FOUND).end();
+                return;
+            } else {
+                repos.push({
+                    orgID : key.orgID,
+                    deptID : key.deptID,
+                    orgName : org.name,
+                    deptName : department.name,
+                    repo : department.repo
+                });
+            }
+        }
+        
+    }
+
+    response.status(StatusCodes.SUCCESS).send(repos);
+}
+
+async function addCredential ( request, response ) {
+    console.log("In the adding function...");
+    //A credential should have a name and at least one other field to save.
+    const requestHasEnoughFields = 
+        request.body.hasOwnProperty('name') &&
+        (request.body.hasOwnProperty('url') ||
+        request.body.hasOwnProperty('username') ||
+        request.body.hasOwnProperty('password'));
+
+    if (!requestHasEnoughFields) {
+        console.log("[WARN] Add credential: Bad request. Not enough fields");
+        response.status(StatusCodes.BAD_REQUEST).send({error: "Require a name and one other field"});
+    }
+
+    const org = await orgModel.findById(request.params.orgID);
+
+    if (!org) {
+        console.log(`[WARN] Add credential: OrgID ${request.params.orgID} not found`);
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const department = org.departments.id(request.params.deptID);
+
+    if (!department) {
+        console.log(`[WARN] Add credential: department ID ${request.params.deptID} not found in org ${request.params.orgID}`);
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    console.log("checks done");
+
+    const newCredential = {name : request.body.name};
+    if (request.body.hasOwnProperty('url')) { newCredential.url = request.body.url };
+    if (request.body.hasOwnProperty('username')) { newCredential.username = request.body.username };
+    if (request.body.hasOwnProperty('password')) { newCredential.password = request.body.password };
+
+    department.repo.push(newCredential);
+    const docToSave = department.repo[department.repo.length-1];
+    const savedDoc = await org.save();
+    console.log(savedDoc);
+    
+    response.status(StatusCodes.SUCCESS).send(newCredential);
+}
+
+async function replaceCredential ( request, response ) {
+    //A credential should have a name and at least one other field to save.
+    const requestHasEnoughFields = 
+        request.body.hasOwnProperty('name') &&
+        (request.body.hasOwnProperty('url') ||
+        request.body.hasOwnProperty('username') ||
+        request.body.hasOwnProperty('password'));
+
+    if (!requestHasEnoughFields) {
+        response.status(StatusCodes.BAD_REQUEST).send({error: "Require a name and one other field"});
+    }
+
+    const org = await orgModel.findById(request.params.orgID);
+
+    if (!org) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const department = org.departments.id(request.params.deptID);
+
+    if (!department) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const credential = department.repos.id(request.params.credID);
+
+    if (!credential) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const newCredential = {name : request.body.name};
+    if (request.body.hasOwnProperty('url')) { newCredential.url = request.body.url };
+    if (request.body.hasOwnProperty('username')) { newCredential.username = request.body.username };
+    if (request.body.hasOwnProperty('password')) { newCredential.password = request.body.password };
+    
+    credential.overwrite(newCredential);
+
+    const savedDoc = await org.save();
+    
+    response.status(StatusCodes.SUCCESS).send(savedDoc);
+}
+
+async function deleteCredential ( request, response ) {
+    const org = await orgModel.findById(request.params.orgID);
+
+    if (!org) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const department = org.departments.id(request.params.deptID);
+
+    if (!department) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    const credential = department.repos.id(request.params.credID);
+
+    if (!credential) {
+        repsonse.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    credential.deleteOne();
+    await org.save();
+
+    response.status(StatusCodes.SUCCESS).end();
+    
+}
+
 
 module.exports = {
     getListOfAllOrgs,
@@ -217,5 +372,9 @@ module.exports = {
     renameOrg,
     addNewDept,
     renameDept,
-    deleteDept
+    deleteDept,
+    getRepos,
+    addCredential,
+    replaceCredential,
+    deleteCredential,
 }

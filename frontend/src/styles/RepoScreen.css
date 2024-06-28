@@ -1,0 +1,10 @@
+table.repo-table {
+    border-collapse : collapse;
+    margin : 30px;
+}
+
+table.repo-table th, table.repo-table td {
+    border : 1px black solid;
+    padding : 0.25rem 0.5rem;
+}
+

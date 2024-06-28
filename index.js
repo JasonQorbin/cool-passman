@@ -11,6 +11,7 @@ const helmet = require('helmet');
 const authRouter = require('./routes/loginRoutes');
 const orgRouter = require('./routes/orgRoutes');
 const userRouter = require('./routes/userRoutes');
+const repoRouter = require('./routes/repoRoutes');
 //Custom middleware
 const { requestLogging } = require('./middleware/logging');
 //Database
@@ -39,6 +40,7 @@ app.get('/', (request, response) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/org',orgRouter);
+app.use('/api/repo', repoRouter);
 app.use('/api', authRouter);
 
 connectToDatabase();

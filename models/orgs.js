@@ -13,7 +13,6 @@ const credentialSchema = mongoose.Schema(
         url : {
             type: String,
             trim : true,
-            required: true,
         },
         username : {
             type: String,

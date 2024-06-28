@@ -28,6 +28,7 @@ class App extends React.Component {
         this.changeToastVisibility = this.changeToastVisibility.bind(this);
         this.showToastMessage = this.showToastMessage.bind(this);
         this.setCurrentUser = this.setCurrentUser.bind(this);
+        this.test = this.test.bind(this);
     }
     
     setCurrentUser(newUser) {
@@ -43,35 +44,43 @@ class App extends React.Component {
             variant = "primary";
         }
 
-        this.setState({toastTitle : title});
-        this.setState({toastMessage : message});
-        this.setState({toastVariant : variant});
-        this.setState({toastMessageVisible : true});
+        this.setState(
+            {
+                toastTitle : title,
+                toastMessage : message,
+                toastVariant : variant,
+                toastMessageVisible : true
+            });
+    }
+
+    test() {
+        console.log(this.state);
     }
 
     render() {
         return (
             <div className="App">
                 <Routes>
-                    <Route path="/login" element={<LoginScreen setCurrentUser={this.setCurrentUser}/>} />
+                    <Route path="/login"    element={<LoginScreen setCurrentUser={this.setCurrentUser} />} />
                     <Route path="/register" element={<RegisterScreen />} />
                     <Route path="/" element={(
                         <PrivateRoute>
                             <MainPageLayout 
-                                currentUser={this.currentUser}
+                                currentUser={this.state.currentUser}
                                 toastVisible={this.state.toastMessageVisible}
                                 changeToastVisibility={this.changeToastVisibility}
                                 showToastMessage={this.showToastMessage}
                                 toastTitle={this.state.toastTitle}
                                 toastMessage={this.state.toastMessage}
                                 toastVariant={this.state.toastVariant}
+                                test={this.test}
                             />
                         </PrivateRoute>
                     )}>
-                        <Route path="/home" element={<HomeScreen />} />
-                        <Route path="/repos" element={<RepoScreen />} />
-                        <Route path="/profile" element={<ProfileScreen />} />
-                        <Route path="/admin" element={<AdminPanel />} />
+                        <Route path="/home"    element={<HomeScreen />} />
+                        <Route path="/repos"   element={<RepoScreen showToastMessage={this.showToastMessage} />} />
+                        <Route path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage} />} />
+                        <Route path="/admin"   element={<AdminPanel showToastMessage={this.showToastMessage} />} />
                     </Route>
                 </Routes>
             </div>
@@ -87,6 +96,7 @@ function MainPageLayout(props) {
             <PageHeader 
                 currentUser={props.currentUser}
                 showToastMessage={props.showToastMessage}
+                test={props.test}
             />
             <div className="content-row">
                 <SideBar />

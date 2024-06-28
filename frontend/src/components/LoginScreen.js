@@ -2,7 +2,6 @@ import "../styles/LoginScreen.css";
 import { getData, postData } from '../utils/fetching';
 import { sessionTokenKey } from '../utils/constants';
 import { useNavigate } from 'react-router-dom';
-import Toast from 'react-bootstrap/Toast';
 
 export default function LoginScreen(props) {
     const navigate = useNavigate();
@@ -24,7 +23,9 @@ export default function LoginScreen(props) {
 
                 //After getting and caching the token, fetch the current user in order to display their name on the
                 //main page header.
-                getData('/api/users/self', props.setCurrentUser); //Todo: Handled errors on this GET operation.
+                getData('/api/users/self', (data) => {
+                    props.setCurrentUser(data);
+                }); //Todo: Handled errors on this GET operation.
                 
                 navigate('/');
             });

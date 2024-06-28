@@ -8,6 +8,7 @@ function SideBar() {
                     <li><Link to="/repos" className="sidebar-item">My Repositories</Link></li>
                     <li><Link to="/profile" className="sidebar-item">My Profile</Link></li>
                     <li><Link to="/admin" className="sidebar-item">Admin Panel</Link></li>
+                    <li><Link to="/login" className="sidebar-item">Login</Link></li>
                 </ul>
             </aside>
         
