@@ -88,6 +88,20 @@ export function patchData(url, bodyContent, responseCallback) {
         });
 }
 
+export function putData(url, bodyContent, responseCallback) {
+    const fetchProperties = {
+        method : 'PUT',
+        headers : {
+            "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(bodyContent)
+    }
+    fetch(url, fetchProperties)
+        .then( response => {
+            responseCallback(response, bodyContent);
+        });
+}
+
 export function deleteResource(url, responseCallback) {
     const fetchProperties = {
         method : 'DELETE',

@@ -304,21 +304,21 @@ async function replaceCredential ( request, response ) {
     const org = await orgModel.findById(request.params.orgID);
 
     if (!org) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
     const department = org.departments.id(request.params.deptID);
 
     if (!department) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
-    const credential = department.repos.id(request.params.credID);
+    const credential = department.repo.id(request.params.credID);
 
     if (!credential) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
@@ -338,21 +338,24 @@ async function deleteCredential ( request, response ) {
     const org = await orgModel.findById(request.params.orgID);
 
     if (!org) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        console.log(`[WARN] Delete credential: Org ${request.params.orgID} not found`);
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
     const department = org.departments.id(request.params.deptID);
 
     if (!department) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        console.log(`[WARN] Delete credential: Department ID ${request.params.deptID} not found in org ${request.params.orgID}`);
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
-    const credential = department.repos.id(request.params.credID);
+    const credential = department.repo.id(request.params.credID);
 
     if (!credential) {
-        repsonse.status(StatusCodes.NOT_FOUND).end();
+        console.log(`[WARN] Delete credential: Credential ${request.params.credID} not found in department ID ${request.params.deptID}  in org ${request.params.orgID}`);
+        response.status(StatusCodes.NOT_FOUND).end();
         return;
     }
 
@@ -376,5 +379,5 @@ module.exports = {
     getRepos,
     addCredential,
     replaceCredential,
-    deleteCredential,
+    deleteCredential
 }

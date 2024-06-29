@@ -1,7 +1,7 @@
 import '../styles/RepoScreen.css';
 import LoadingWidget from "./LoadingWidget";
 import CredentialInputForm from './CredentialInputForm';
-import { getData, postData } from "../utils/fetching";
+import { deleteResource, getData, postData, putData } from "../utils/fetching";
 import { useState } from "react";
 import TransparentOverlay from './TransparentOverlay';
 
@@ -17,6 +17,28 @@ export default function RepoScreen(props) {
         const newRepos = repos.map( repo => {
             if (repo.orgID == orgID && repo.deptID == deptID) {
                 repo.repo.push(newCredential);
+            }
+            return repo;
+        });
+
+        setRepos(newRepos);
+    }
+    
+    function updateCredential( orgID, deptID, index, newCredential ) {
+        const newRepos = repos.map( repo => {
+            if (repo.orgID == orgID && repo.deptID == deptID) {
+                repo.repo[index] = newCredential;
+            }
+            return repo;
+        });
+
+        setRepos(newRepos);
+    }
+
+    function deleteCredential( orgID, deptID, index ) {
+        const newRepos = repos.map( repo => {
+            if (repo.orgID == orgID && repo.deptID == deptID) {
+                repo.repo.splice(index, 1);
             }
             return repo;
         });
@@ -42,6 +64,8 @@ export default function RepoScreen(props) {
                         repo={repos[0]}
                         addCredential={addCredential}
                         showToastMessage={props.showToastMessage}
+                        updateCachedCredential={updateCredential}
+                        deleteCachedCredential={deleteCredential}
                     />
                 </div>
             );
@@ -75,9 +99,8 @@ function RepoTab(props) {
 
     function createCredentialOnServer( credential ) {
         postData(`/api/repo/${props.repo.orgID}/${props.repo.deptID}`, credential, (response) => {
-            if (response.status == 200) {
+            if (response.status === 200) {
                 response.json().then( newCredential => {
-                    console.log(newCredential);
                     props.addCredential(props.repo.orgID, props.repo.deptID, newCredential);
                 });
             } else {
@@ -87,15 +110,40 @@ function RepoTab(props) {
     }
 
     function changeCredentialOnServer( credential ) {
-        console("Edit on server");
-        console.log(credential);
+        const credentialID = props.repo.repo[selectedIdx]._id;
+        putData(`/api/repo/${props.repo.orgID}/${props.repo.deptID}/${credentialID}`, credential, (response) => {
+            if (response.status === 200) {
+                response.json().then( newCredential => {
+                    props.updateCachedCredential(props.repo.orgID, props.repo.deptID, credentialID, newCredential);
+                });
+            } else {
+                props.showToastMessage("Error", `Couldn't modify credential on the server`, 'warning');
+            }
+        });
         hideOverlay();
     }
+
+    function deteleSelectedCredentialOnServer () {
+        const credentialID = props.repo.repo[selectedIdx]._id;
+
+        deleteResource(`/api/repo/${props.repo.orgID}/${props.repo.deptID}/${credentialID}`, (response) => {
+            if (response.status === 200) {
+                props.deleteCachedCredential(props.repo.orgID, props.repo.deptID, selectedIdx);
+            } else {
+                props.showToastMessage("Error", `Couldn't modify credential on the server`, 'warning');
+            }
+        });
+
+    }
+
+
 
     const repoTableRows = props.repo.repo.map( 
         (credential, index) => {
            return ( 
-                <tr key={index} onClick={()=> setSelectedIdx(index)}>
+                <tr key={index}
+                    onClick={()=> setSelectedIdx(index)}
+                    className={selectedIdx == index ? "selected" : ""}>
                     <td>{credential.name}</td>
                     <td>{credential.url}</td>
                     <td>{credential.username}</td>
@@ -110,8 +158,8 @@ function RepoTab(props) {
     
     //Todo: Restrict these buttons to only Managers and Admins
     if (selectedIdx > -1) {
-        repoEditButtons.push( <button key="edit">Edit Item</button> );
-        repoEditButtons.push( <button key="delete">Delete Item</button> );
+        repoEditButtons.push( <button key="edit" onClick={getCredentialEdit}>Edit Item</button> );
+        repoEditButtons.push( <button key="delete" onClick={deteleSelectedCredentialOnServer}>Delete Item</button> );
     }
  
     let overlay;  

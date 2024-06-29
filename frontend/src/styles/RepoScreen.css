@@ -8,3 +8,12 @@ table.repo-table th, table.repo-table td {
     padding : 0.25rem 0.5rem;
 }
 
+
+table.repo-table tbody tr:hover {
+    background : lightpink;
+}
+
+
+table.repo-table tbody tr.selected {
+    background : lightsalmon;
+}
