@@ -61,55 +61,79 @@ export function getData(url, setData, setLoading, setLoaded, setErrorMsg, setErr
 }
 
 export function postData(url, bodyContent, responseCallback) {
-    const fetchProperties = {
+    const fetchOptions = {
         method : 'POST',
         headers : {
             "Content-Type" : "application/json"
         },
         body : JSON.stringify(bodyContent)
     }
-    fetch(url, fetchProperties)
+
+    const authToken = sessionStorage.getItem(sessionTokenKey);
+    if (authToken !== undefined) {
+        fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
+    }
+
+    fetch(url, fetchOptions)
         .then( response => {
             responseCallback(response, bodyContent);
         });
 }
 
 export function patchData(url, bodyContent, responseCallback) {
-    const fetchProperties = {
+    const fetchOptions = {
         method : 'PATCH',
         headers : {
             "Content-Type" : "application/json"
         },
         body : JSON.stringify(bodyContent)
     }
-    fetch(url, fetchProperties)
+
+    const authToken = sessionStorage.getItem(sessionTokenKey);
+    if (authToken !== undefined) {
+        fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
+    }
+
+    fetch(url, fetchOptions)
         .then( response => {
             responseCallback(response, bodyContent);
         });
 }
 
 export function putData(url, bodyContent, responseCallback) {
-    const fetchProperties = {
+    const fetchOptions = {
         method : 'PUT',
         headers : {
             "Content-Type" : "application/json"
         },
         body : JSON.stringify(bodyContent)
     }
-    fetch(url, fetchProperties)
+
+    const authToken = sessionStorage.getItem(sessionTokenKey);
+    if (authToken !== undefined) {
+        fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
+    }
+
+    fetch(url, fetchOptions)
         .then( response => {
             responseCallback(response, bodyContent);
         });
 }
 
 export function deleteResource(url, responseCallback) {
-    const fetchProperties = {
+    const fetchOptions = {
         method : 'DELETE',
         headers : {
             "Content-Type" : "application/json"
         },
     }
-    fetch(url, fetchProperties)
+
+    const authToken = sessionStorage.getItem(sessionTokenKey);
+    if (authToken !== undefined) {
+        fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
+    }
+
+    fetch(url, fetchOptions)
         .then( response => {
             responseCallback(response);
         });

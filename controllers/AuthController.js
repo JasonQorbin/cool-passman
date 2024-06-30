@@ -123,6 +123,25 @@ async function registerNewUser( request, response ) {
     }
 }
 
+async function changePassword( request, response ) {
+    const authHeader = request.headers.authorisation.split(' ');
+    if (authHeader.length != 2 || authHeader[0] !== "Bearer") {
+        console.log(`[WARN] Change Password: Could not read auth header ${request.headers.authorisation}`);
+        response.status(StatusCodes.UNAUTHORISED).send({error: "Expected Authorisation header in the form 'Bearer <token>'"});
+    } else {
+        const payload = verifyAndDecodeToken(authHeader[1]);
+        const userDoc = await userModel.findById(payload._id);
+        if (userDoc.password !== request.body.oldPassword) {
+            console.log(`[WARN] Change Password: Could not verify old password`);
+            request.status(StatusCodes.BAD_REQUEST).send({error: "Old password incorrect"});
+        } else {
+            userDoc.password = request.body.newPassword;
+            await userDoc.save();
+            response.status(StatusCodes.SUCCESS).end();
+        }
+    }
+}
+
 
 function verifyAndDecodeToken(token) {
     try {
@@ -135,5 +154,6 @@ function verifyAndDecodeToken(token) {
 module.exports = {
     authenticateUser,
     registerNewUser,
-    verifyAndDecodeToken
+    verifyAndDecodeToken,
+    changePassword
 }

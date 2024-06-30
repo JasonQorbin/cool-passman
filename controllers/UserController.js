@@ -29,8 +29,7 @@ function sanitizeUser(user) {
 function requestHasRequiredUserFields(request) {
     return  request.body.hasOwnProperty('firstName') &&
             request.body.hasOwnProperty('lastName') &&
-            request.body.hasOwnProperty('email') &&
-            request.body.hasOwnProperty('password');
+            request.body.hasOwnProperty('email')
 }
 
 async function getListOfAllUsers( request, response ) {
@@ -92,10 +91,13 @@ async function overwriteUserProfile ( request, response ) {
         objectToApply.position = request.body.position
     }
 
-    //Get the old password hash
+    //Get the old password hash and role (a person can't change their own role in this operation)
     objectToApply.password = oldProfile.password;
+    objectToApply.role = oldProfile.role;
+    objectToApply.authorised_repos = oldProfile.authorised_repos;
+
     
-    oldProfile.replace(objectToApply);
+    oldProfile.overwrite(objectToApply);
     const savedUser = await oldProfile.save();
 
     response.status(StatusCodes.SUCCESS).send(sanitizeUser(savedUser));

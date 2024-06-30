@@ -11,6 +11,7 @@ userRouter.get('/', UserController.getListOfAllUsers);
 userRouter.get('/self', UserController.getSelf);
 userRouter.post('/', AuthController.registerNewUser);
 userRouter.put('/:userID', UserController.overwriteUserProfile);
+userRouter.patch('/password-change', AuthController.changePassword);
 userRouter.patch('/:userID', UserController.changeUserAccessLevel);
 userRouter.delete('/:userID', UserController.deleteUser);
 

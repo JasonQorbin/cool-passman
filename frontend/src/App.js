@@ -12,6 +12,7 @@ import RepoScreen from "./components/RepoScreen";
 import ProfileScreen from "./components/ProfileScreen";
 import ToastMessage from "./components/ToastMessage";
 import { sessionTokenKey } from "./utils/constants";
+import { getData } from "./utils/fetching";
 
 class App extends React.Component {
     constructor() {
@@ -29,6 +30,14 @@ class App extends React.Component {
         this.showToastMessage = this.showToastMessage.bind(this);
         this.setCurrentUser = this.setCurrentUser.bind(this);
         this.test = this.test.bind(this);
+
+        this.checkCurrentUser();
+    }
+
+    checkCurrentUser() {
+        if (sessionStorage.getItem(sessionTokenKey) && !this.state.currentUser) {
+            getData('/api/users/self', this.setCurrentUser);
+        }
     }
     
     setCurrentUser(newUser) {
@@ -79,7 +88,7 @@ class App extends React.Component {
                     )}>
                         <Route path="/home"    element={<HomeScreen />} />
                         <Route path="/repos"   element={<RepoScreen showToastMessage={this.showToastMessage} />} />
-                        <Route path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage} />} />
+                        <Route path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage} setCurrentUser={this.setCurrentUser} />} />
                         <Route path="/admin"   element={<AdminPanel showToastMessage={this.showToastMessage} />} />
                     </Route>
                 </Routes>

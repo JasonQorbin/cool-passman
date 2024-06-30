@@ -1,16 +1,68 @@
 import { useState } from 'react';
-import { getData } from '../utils/fetching';
+import { getData, putData, patchData } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 
 export default function ProfileScreen(props) {
     const [ tempUser, setTempUser ] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
-    const [errorState, setErrorState] = useState(false);
-    const [errorMsg, setErrorMsg] = useState(false);
     
+    function sendUserUpdateToServer(event) {
+        event.preventDefault();
+        const userToSend = {
+            firstName : document.getElementById("first-name-field").value,
+            lastName : document.getElementById("last-name-field").value,
+            email : document.getElementById("email-field").value,
+            position : document.getElementById("position-field").value
+        };
+
+        putData(`/api/users/${tempUser._id}`, userToSend, (response) => {
+            if (response.status != 200 ) {
+                props.showToastMessage("Error", "User wasn't updated", "danger");
+            } else {
+                response.json().then( savedUser => {
+                    props.setCurrentUser(savedUser);
+                    props.showToastMessage("Success", "User profile updated", "success");
+                });
+            }
+        });
+    }
+
+    function requestPasswordChange(event) {
+        event.preventDefault();
+        const passwordElement1 = document.getElementById("new-password-field");
+        const passwordElement2 = document.getElementById("new-password-confirm-field");
+
+        if (passwordElement1.value !== passwordElement2.value) {
+            passwordElement2.setCustomValidity("Passwords don't match");
+            passwordElement2.reportValidity();
+        } else {
+            const objectToSend = {
+                oldPassword: document.getElementById('old-password-field').value,
+                newPassword: document.getElementById('new-password-field').value,
+            }
+
+            patchData(`/api/users/password-change`, objectToSend, (response) => {
+                if ( response.status != 200 ) {
+                    props.showToastMessage("Error", "Password was not changed", "danger");
+                } else {
+                    props.showToastMessage("Success", "Password changed successfully", "success");
+                }
+            });
+        }
+    }
+
+    function resetPasswordValidation() {
+        const passwordElement1 = document.getElementById("new-password-field");
+        const passwordElement2 = document.getElementById("new-password-confirm-field");
+
+        passwordElement1.setCustomValidity("");
+        passwordElement2.setCustomValidity("");
+    }
+    
+
     if (!loaded && !loading) {
-        getData('/api/users/random', setTempUser, setLoading, setLoaded, setErrorMsg, setErrorState)
+        getData('/api/users/self', setTempUser, setLoading, setLoaded)
             .catch( () => console.log("Error while fetching user data"));
     }
     
@@ -21,7 +73,7 @@ export default function ProfileScreen(props) {
             <div>
                 <h1>User profile - {tempUser.firstName} {tempUser.lastName}</h1>
                 <hr className="blue-divider" />
-                <form>
+                <form onSubmit={sendUserUpdateToServer}>
                     <h2>Edit your profile:</h2>
                     <div className="form-row">
                         <label htmlFor="first-name-field">First name(s):</label>
@@ -43,20 +95,33 @@ export default function ProfileScreen(props) {
                         <input type="submit" value="Confirm" id="user-edit-submit" />
                     </div>
                 </form>
-                    <hr />
-                <form>
+                    <hr className="blue-divider" />
+                <form onSubmit={requestPasswordChange}>
                     <h2>Change your password:</h2>
                     <div className="form-row">
                         <label htmlFor="old-password-field">Old password:</label>
-                        <input type="text" id="old-password-field" placeholder="Old password"/>
+                        <input type="password" id="old-password-field" placeholder="Old password" required/>
                     </div>
                     <div className="form-row">
                         <label htmlFor="new-password-field">New password:</label>
-                        <input type="text" id="new-password-field" placeholder="New password"/>
+                        <input type="password"
+                            id="new-password-field"
+                            placeholder="New password"
+                            onChange={resetPasswordValidation}
+                            minLength={8}
+                            required
+                        />
                     </div>
                     <div className="form-row">
                         <label htmlFor="new-password-confirm-field">Confirm new password:</label>
-                        <input type="text" id="new-password-confirm-field" placeholder="Confirm new password"/>
+                        <input type="password"
+                            id="new-password-confirm-field"
+                            placeholder="Confirm new password"
+                            onChange={resetPasswordValidation}
+                            minLength={8}
+                            required
+
+                        />
                     </div>
                     <div className="form-row">
                         <input type="submit" value="Change" id="password-change-submit" />
