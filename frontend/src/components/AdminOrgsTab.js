@@ -5,15 +5,11 @@ import SimpleItemTable from './SimpleItemTable';
 import TransparentTextInputOverlay from './TransparentTextInputOverlay';
 import { useState } from 'react';
 
-function AdminOrgUnitsPanel() {
+function AdminOrgUnitsPanel(props) {
     const [orgs, setOrgs] = useState([]);
     const [loadingOrgs, setLoadingOrgs] = useState(false);
     const [loadedOrgs, setLoadedOrgs] = useState(false);
 
-    const [depts, setDepts] = useState([]);
-    const [loadingDepts, setLoadingDepts] = useState(false);
-    const [loadedDepts, setLoadedDepts] = useState(false);
-    
     const [errorState, setErrorState] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [selectedOrg, setSelectedOrg] = useState(null);
@@ -23,8 +19,6 @@ function AdminOrgUnitsPanel() {
 
     function invalidateCachedData() {
         setLoadedOrgs(false);
-        setLoadedDepts(false);
-        setSelectedDept(null);
         setSelectedDept(null);
     }
 
@@ -50,8 +44,6 @@ function AdminOrgUnitsPanel() {
     
     function selectNewOrg(newOrg) {
         setSelectedOrg(newOrg);
-        setSelectedDept(null);
-        setLoadedDepts(false);
     }
     
     /**
@@ -91,7 +83,7 @@ function AdminOrgUnitsPanel() {
         if (response.status == 201) {
             invalidateCachedData();
         } else {
-            //Toast showing error message
+            props.showToastMessage("Error", "Failed to create new Org Unit");
         }
         
     }
@@ -283,11 +275,6 @@ function AdminOrgUnitsPanel() {
             .catch( () => console.log("Error while fetching OU data"));
     }
 
-    if ( loadedOrgs && selectedOrg && !loadingDepts && !loadedDepts ) {
-        getData(`/api/org/${selectedOrg}`, setDepts, setLoadingDepts, setLoadedDepts, setErrorMsg, setErrorState)
-            .catch( () => console.log("Error while fetching department data"));
-    }
-
     //Create the transparent input overlay if needed.
 
     const overlay = [];
@@ -314,7 +301,7 @@ function AdminOrgUnitsPanel() {
     //Populate the buttons above the Department table
 
     const deptButtons = [];
-    if (loadedDepts && !errorState) {
+    if (loadedOrgs && selectedOrg) {
         deptButtons.push(<button key="add-dept-button" onClick={addDeptButtonPress}>Add Dept</button>);
         if (selectedDept) {
             deptButtons.push(<button key="rename-dept-button" onClick={renameDeptButtonPress}>Rename Dept</button>);
@@ -338,17 +325,18 @@ function AdminOrgUnitsPanel() {
         }
     }
 
-    if ( loadedOrgs && selectedOrg && loadingDepts || loadedDepts ) {
-        if (loadingDepts) {
-            tableGroups.push(<LoadingWidget key="depts" />);
-        } else {
-            tableGroups.push(
-                <div className="table-group" key="depts">
-                    {deptButtons}
-                    <SimpleItemTable title="Departments" items={depts}  setSelectedCb={setSelectedDept} selected={selectedDept} />
-                </div>
-            );
-        }
+    if ( loadedOrgs && selectedOrg ) {
+        tableGroups.push(
+            <div className="table-group" key="depts">
+                {deptButtons}
+                <SimpleItemTable 
+                    title="Departments"
+                    items={getSelectedOrg().departments}
+                    setSelectedCb={setSelectedDept}
+                    selected={selectedDept}
+                />
+            </div>
+        );
     }
 
 
