@@ -92,6 +92,14 @@ async function resetDatabase(silent) {
                         }
                     ] 
                 });
+                
+                if (i == 0) {
+                    newUser.role = 'admin';
+                }
+
+                if (i == 9) {
+                    newUser.role = 'manager';
+                }
 
                 await newUser.save();
             }
@@ -101,7 +109,7 @@ async function resetDatabase(silent) {
     });
 }
 
-//resetDatabase();
+//resetDatabase(false);
 //disconnectFromDatabase();
 
 module.exports.resetDatabase = resetDatabase;
