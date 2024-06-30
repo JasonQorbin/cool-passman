@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const authorisationSchema = mongoose.Schema(
+    {
+        orgID : {
+            type: mongoose.ObjectId,
+            required: true
+        },
+        deptID: mongoose.ObjectId
+    }
+)
+
+
 const userSchema = mongoose.Schema(
     {
         firstName : {
@@ -29,15 +40,7 @@ const userSchema = mongoose.Schema(
             required : true,
             default : "user"
         },
-        authorised_repos : [
-            {
-                orgID : {
-                    type: mongoose.ObjectId,
-                    required: true
-                },
-                deptID: mongoose.ObjectId
-            }
-        ]
+        authorised_repos : [ authorisationSchema ]
     }
 );
 

@@ -2,13 +2,20 @@ import '../styles/AdminUsersTab.css';
 import LoadingWidget from './LoadingWidget';
 import { useState } from 'react';
 import { getData, patchData, deleteResource } from "../utils/fetching";
+import RepoAccessForm from './RepoAccessForm';
+import TransparentOverlay from './TransparentOverlay';
 
 export default function AdminUsersTab(props) {
     const [users, setUsers] = useState([]);
+    const [orgs, setOrgs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
+    const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
     const [errorState, setErrorState] = useState(false);
     const [errorMsg, setErrorMsg] = useState(false);
+    const [ overlayVisible, setOverlayVisible ] = useState(false);
+    const [ overlayMode, setOverlayMode ] = useState("");
+    
     
     /**
       * Helper function that searches for the user that matches the given id string and returns that user object. 
@@ -85,15 +92,79 @@ export default function AdminUsersTab(props) {
         }
     }
 
+    function hideOverlay() {
+        setOverlayVisible(false);
+        setSelectedUserIndex(-1);
+    }
+
+    function openRepoAccessOverlay(event) {
+        const index = event.target.value;
+
+        setSelectedUserIndex(index);
+        setOverlayVisible(true);
+    }
+
+    function updateUser(newUser) {
+        const newUserArray = users.map(item => {
+            if (item._id === newUser._id) {
+                return newUser;
+            } else {
+                return item;
+            }
+        });
+        setUsers(newUserArray);
+    }
+
     
     // Load data from the server if necessary
     
-    if (!loaded && !loading) {
-        getData('/api/users', setUsers, setLoading, setLoaded, setErrorMsg, setErrorState)
-            .catch( () => console.log("Error while fetching user data"));
+    if (!loaded && !loading && ! errorState) {
+        let usersLoaded = false;
+        let orgsLoaded = false;
+
+        try {
+            getData('/api/users', setUsers)
+            usersLoaded = true;
+        } catch( error ) {
+            console.log("Error while fetching user data");
+            props.showToastMessage("Error", "Couldn't load the user data");
+            setErrorState(true);
+        };
+
+        try {
+            getData('/api/org', setOrgs)
+            orgsLoaded = true;
+        } catch( error ) {
+            console.log("Error while fetching org unit data");
+            props.showToastMessage("Error", "Couldn't load the org unit data");
+            setErrorState(true);
+        };
+        
+        if (usersLoaded && orgsLoaded) {
+            setLoaded(true);
+        }
+        setLoading(false);
     }
     
-    const tableRows = users.map( (user) => {
+    let overlay;
+    if ( !overlayVisible ) {
+        overlay = <div></div>;
+    } else {
+        overlay = (
+        <TransparentOverlay>
+            <RepoAccessForm
+                orgs={orgs}
+                closeOverlay={hideOverlay}
+                selectedUser={users[selectedUserIndex]}
+                updateUser={updateUser}
+            />
+        </TransparentOverlay>
+        );
+    }
+
+
+    
+    const tableRows = users.map( (user, index) => {
         const accessButtons = [];
         if (user.role !== "admin") {
             accessButtons.push(
@@ -120,6 +191,7 @@ export default function AdminUsersTab(props) {
                         <td className="title-column">{user.position}</td>
                         <td className="role-column">{user.role}</td>
                         {accessButtons}
+                        <td className="button-column"><button value={index} onClick={openRepoAccessOverlay}>Department access</button></td>
                         <td className="button-column"><button value={user._id} onClick={deleteUserButtonPress}>Delete User</button></td>
                     </tr>
         )
@@ -130,6 +202,7 @@ export default function AdminUsersTab(props) {
     } else {
         return (
             <div>
+                {overlay}
                 <table id="admin-users-table">
                     <thead>
                         <tr>
@@ -146,8 +219,6 @@ export default function AdminUsersTab(props) {
             </div>
         );
     }
-
-
 }
 
 

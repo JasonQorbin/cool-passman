@@ -14,6 +14,10 @@ userRouter.put('/:userID', UserController.overwriteUserProfile);
 userRouter.patch('/:userID', UserController.changeUserAccessLevel);
 userRouter.delete('/:userID', UserController.deleteUser);
 
+//Change access to repos
+userRouter.patch('/:userID/add_dept', UserController.addDepartment);
+userRouter.patch('/:userID/remove_dept', UserController.removeDepartment);
+
 //Temporary routes for testing
 userRouter.get('/random', UserController.getArbitraryUser);
 

@@ -24,6 +24,7 @@ export default function RepoScreen(props) {
         setRepos(newRepos);
     }
     
+    
     function updateCredential( orgID, deptID, index, newCredential ) {
         const newRepos = repos.map( repo => {
             if (repo.orgID == orgID && repo.deptID == deptID) {
@@ -107,6 +108,7 @@ function RepoTab(props) {
                 props.showToastMessage("Error", "Couldn't create new credential", 'warning');
             }
         });
+        hideOverlay();
     }
 
     function changeCredentialOnServer( credential ) {

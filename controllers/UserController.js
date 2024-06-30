@@ -111,6 +111,65 @@ async function deleteUser ( request, response ) {
     }
 }
 
+async function addDepartment( request, response ) {
+    const haveRequiredFields = request.body.hasOwnProperty('orgID') && request.body.hasOwnProperty('deptID');
+
+    if (!haveRequiredFields) {
+        console.log(`[WARN] Add department: Required body fields were missing`);
+        response.status(StatusCodes.BAD_REQUEST).end();
+        return;
+    }
+
+    const userDoc = await userModel.findById(request.params.userID);
+
+    if (!userDoc) {
+        console.log(`[WARN] Add department: Could not find User ${request.params.userID}`);
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+
+    userDoc.authorised_repos.push({orgID: request.body.orgID, deptID: request.body.deptID});
+
+    await userDoc.save();
+
+    response.status(StatusCodes.SUCCESS).end();
+
+}
+
+async function removeDepartment( request, response ) {
+    const haveRequiredFields = request.body.hasOwnProperty('orgID') && request.body.hasOwnProperty('deptID');
+
+    if (!haveRequiredFields) {
+        console.log(`[WARN] Add department: Required body fields were missing`);
+        response.status(StatusCodes.BAD_REQUEST).end();
+        return;
+    } 
+
+    const userDoc = await userModel.findById(request.params.userID);
+
+    if (!userDoc) {
+        console.log(`[WARN] Remove department: Could not find User ${request.params.userID}`);
+        response.status(StatusCodes.NOT_FOUND).end();
+        return;
+    }
+    
+    console.log(userDoc.authorised_repos);
+    const authorisationToDelete = userDoc.authorised_repos.filter( (authRecord) => {
+        return authRecord.orgID == request.body.orgID && authRecord.deptID == request.body.deptID;
+    }).pop();
+    
+    if (!authorisationToDelete) {
+    console.log(`[WARN] Remove department: Could not find authorisation record to delete (Org: ${request.body.orgID} -> Dept: ${request.body.deptID}`);
+    response.status(StatusCodes.NOT_FOUND).end();
+    return;
+    }
+
+    authorisationToDelete.deleteOne();
+    await userDoc.save();
+
+    response.status(StatusCodes.SUCCESS).end();
+}
+
 /**
   * Temporary function for testing the user profile page.
   * 
@@ -133,5 +192,7 @@ module.exports = {
     changeUserAccessLevel,
     deleteUser,
     getSelf,
+    addDepartment,
+    removeDepartment,
     getArbitraryUser
 }
