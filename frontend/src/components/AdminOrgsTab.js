@@ -10,6 +10,8 @@ function AdminOrgUnitsPanel(props) {
     const [loadingOrgs, setLoadingOrgs] = useState(false);
     const [loadedOrgs, setLoadedOrgs] = useState(false);
 
+    const [authorisedUsers, setAuthorisedUsers] = useState([]);
+
     const [errorState, setErrorState] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [selectedOrg, setSelectedOrg] = useState(null);
@@ -19,6 +21,7 @@ function AdminOrgUnitsPanel(props) {
 
     function invalidateCachedData() {
         setLoadedOrgs(false);
+        setAuthorisedUsers([]);
         setSelectedDept(null);
     }
 
@@ -44,6 +47,11 @@ function AdminOrgUnitsPanel(props) {
     
     function selectNewOrg(newOrg) {
         setSelectedOrg(newOrg);
+    }
+
+    function selectNewDept(newDept) {
+        setSelectedDept(newDept);
+        getData(`/api/users/list-users/${selectedOrg}/${newDept}`, setAuthorisedUsers);
     }
     
     /**
@@ -332,21 +340,54 @@ function AdminOrgUnitsPanel(props) {
                 <SimpleItemTable 
                     title="Departments"
                     items={getSelectedOrg().departments}
-                    setSelectedCb={setSelectedDept}
+                    setSelectedCb={selectNewDept}
                     selected={selectedDept}
                 />
             </div>
         );
     }
-
+    
+    let authorisedUsersTable = <div></div>;
+    if ( authorisedUsers.length > 0 ) {
+        const authorisedUserRows = authorisedUsers.map( user => {
+            return (
+                <tr>
+                    <td>{user.firstName} {user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.position}</td>
+                    <td>{user.role}</td>
+                </tr>
+            )
+        }); 
+        authorisedUsersTable = (
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Position</th>
+                        <th>Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {authorisedUserRows}
+                </tbody>
+            </table>
+        )
+    }
 
     if (errorState) {
         return <div>Error: {errorMsg}</div>;
     } else {
         return (
             <div id="admin-org-unit-tab">
-                {overlay}
-                {tableGroups}
+                <div>
+                    {overlay}
+                    {tableGroups}
+                </div>
+                <div>
+                    {authorisedUsersTable}
+                </div>
             </div>
         );
     }

@@ -1,12 +1,29 @@
 const { userModel } = require("../models/users");
 const StatusCodes = require('../utils/http-codes');
 const { verifyAndDecodeToken } = require("./AuthController");
+const { ObjectId } = require("mongoose").Types;
 
+/**
+ * Sanitizes user objects that are to be sent to the client.
+ *
+ * Certain properties should never need to be sent to the client liek passwords (even if they are hashed)
+ * and mongoose version numbers. This function converts the user mongoose document to a plain object and
+ * strips the sensitive/unecessary fields.
+ *
+ * @param {Document} The user documents retireved from the database.
+ * @returns {Object} A sanitized object that can be sent to the client.
+ *
+ */
 function sanitizeUser(user) {
-    if (user.hasOwnProperty('password')) {
-        delete user.password;
+    const newObject = user.toObject();
+    delete newObject.password;
+    if (newObject.hasOwnProperty('password')) {
+        delete newObject.password;
     }
-    return user;
+    if (newObject.hasOwnProperty('__v')) {
+        delete newObject.__v;
+    }
+    return newObject;
 }
 
 function requestHasRequiredUserFields(request) {
@@ -136,6 +153,23 @@ async function addDepartment( request, response ) {
 
 }
 
+async function getAuthorisedUsers( request, response ) {
+    const users = await userModel.find(
+        {
+            'authorised_repos.orgID': ObjectId.createFromHexString(request.params.orgID),
+            'authorised_repos.deptID': ObjectId.createFromHexString(request.params.deptID) 
+        });
+    
+    const sanitizedUsers = users.map( user => {
+        const newObject =  sanitizeUser(user);
+        return newObject;
+        
+    });
+    console.log(sanitizedUsers);
+
+    response.status(StatusCodes.SUCCESS).send(sanitizedUsers);
+}
+
 async function removeDepartment( request, response ) {
     const haveRequiredFields = request.body.hasOwnProperty('orgID') && request.body.hasOwnProperty('deptID');
 
@@ -194,5 +228,6 @@ module.exports = {
     getSelf,
     addDepartment,
     removeDepartment,
+    getAuthorisedUsers,
     getArbitraryUser
 }
