@@ -66,6 +66,7 @@ export default function RepoScreen(props) {
                         showToastMessage={props.showToastMessage}
                         updateCachedCredential={updateCredential}
                         deleteCachedCredential={deleteCredential}
+                        currentUser={props.currentUser}
                     />
                 </div>
             );
@@ -158,7 +159,7 @@ function RepoTab(props) {
     repoEditButtons.push( <button key="add" onClick={getNewCredentialInput}>Add Item</button> );
     
     //Todo: Restrict these buttons to only Managers and Admins
-    if (selectedIdx > -1) {
+    if (selectedIdx > -1 && props.currentUser.role != 'user') {
         repoEditButtons.push( <button key="edit" onClick={getCredentialEdit}>Edit Item</button> );
         repoEditButtons.push( <button key="delete" onClick={deteleSelectedCredentialOnServer}>Delete Item</button> );
     }

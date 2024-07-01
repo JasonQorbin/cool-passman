@@ -73,7 +73,8 @@ class App extends React.Component {
 
     render() {
         const mainPageRoutes = [
-            <Route key="repos" path="/repos" element={<RepoScreen showToastMessage={this.showToastMessage} />} />,
+            (<Route key="repos" path="/repos"
+                element={<RepoScreen showToastMessage={this.showToastMessage} currentUser={this.state.currentUser}/>} />),
             (<Route key="profile" path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage}
                 setCurrentUser={this.setCurrentUser} />} />),
         ];
