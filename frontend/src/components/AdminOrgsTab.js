@@ -51,7 +51,21 @@ function AdminOrgUnitsPanel(props) {
 
     function selectNewDept(newDept) {
         setSelectedDept(newDept);
-        getData(`/api/users/list-users/${selectedOrg}/${newDept}`, setAuthorisedUsers);
+        getData(`/api/users/list-users/${selectedOrg}/${newDept}`, setAuthorisedUsers, null, null,(response) =>{
+            switch (response.status) {
+                case 401:
+                    //Token may be bad. Make the user log in again
+                    break;
+                case 403:
+                    props.showToastMessage("Error", "You don't have the correct privileges to perform this action", "danger");
+                    break;
+                default:
+                    console.log(`Code received: ${response.status}`);
+                    console.log(response);
+                    props.showToastMessage("Error", "An error occured on the server", "warning");
+                    break;
+            }
+        });
     }
     
     /**
@@ -276,11 +290,26 @@ function AdminOrgUnitsPanel(props) {
             invalidateCachedData()
         }
     }
-    // Load data from the server if necessary
     
+    // Load OU data from the server if it hasn't been already.
     if (!loadedOrgs && !loadingOrgs) {
-        getData('/api/org', setOrgs, setLoadingOrgs, setLoadedOrgs, setErrorMsg, setErrorState)
-            .catch( () => console.log("Error while fetching OU data"));
+        getData('/api/org', setOrgs, setLoadingOrgs, setLoadedOrgs, (response) => {
+            switch (response.status) {
+                case 401:
+                    //Token may be bad. Make the user log in again
+                    console.log("Got a 401");
+                    break;
+                case 403:
+                    console.log("Got a 403");
+                    props.showToastMessage("Error", "You don't have the correct privileges to perform this action", "danger");
+                    break;
+                default:
+                    console.log("Got some other error");
+                    props.showToastMessage("Error", "An error occured on the server", "warning");
+                    break;
+            }
+
+        });
     }
 
     //Create the transparent input overlay if needed.

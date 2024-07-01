@@ -5,20 +5,21 @@ const express = require('express');
 const userRouter = express.Router();
 const UserController = require('../controllers/UserController');
 const AuthController = require('../controllers/AuthController');
+const { adminsOnly, adminsAndTheSameUserOnly, authorisedManagersOnly, authorisedUsersOnly, allRegisteredUsers } = require('../middleware/authorization');
 
 //List and manipulate users
-userRouter.get('/', UserController.getListOfAllUsers);
-userRouter.get('/self', UserController.getSelf);
-userRouter.post('/', AuthController.registerNewUser);
-userRouter.put('/:userID', UserController.overwriteUserProfile);
-userRouter.patch('/password-change', AuthController.changePassword);
-userRouter.patch('/:userID', UserController.changeUserAccessLevel);
-userRouter.delete('/:userID', UserController.deleteUser);
+userRouter.get   ('/',                adminsOnly,               UserController.getListOfAllUsers);
+userRouter.get   ('/self',            allRegisteredUsers,       UserController.getSelf);
+userRouter.post  ('/',                                          AuthController.registerNewUser);
+userRouter.put   ('/:userID',         adminsAndTheSameUserOnly, UserController.overwriteUserProfile);
+userRouter.patch ('/password-change', allRegisteredUsers,       AuthController.changePassword);
+userRouter.patch ('/:userID',         adminsOnly,               UserController.changeUserAccessLevel);
+userRouter.delete('/:userID',         adminsOnly,               UserController.deleteUser);
 
 //Access privileges
-userRouter.get('/list-users/:orgID/:deptID', UserController.getAuthorisedUsers);
-userRouter.patch('/:userID/add_dept', UserController.addDepartment);
-userRouter.patch('/:userID/remove_dept', UserController.removeDepartment);
+userRouter.get  ('/list-users/:orgID/:deptID', adminsOnly, UserController.getAuthorisedUsers);
+userRouter.patch('/:userID/add_dept',          adminsOnly, UserController.addDepartment);
+userRouter.patch('/:userID/remove_dept',       adminsOnly, UserController.removeDepartment);
 
 
 

@@ -48,11 +48,10 @@ export default function RepoScreen(props) {
     }
 
     if (!loaded && !loading) {
-        getData('/api/repo', setRepos, setLoading, setLoaded, setErrorMsg, setErrorState)
-            .catch( () => {
-                console.log("Error while fetching repository data");
+        getData('/api/repo', setRepos, setLoading, setLoaded, (response) => {
                 props.showToastMessage("Data error", "Error while fetching repository data",'warning');
-            });
+            }
+        );
     }
     
     if (!loaded) {

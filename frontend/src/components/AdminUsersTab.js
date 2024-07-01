@@ -12,7 +12,6 @@ export default function AdminUsersTab(props) {
     const [loaded, setLoaded] = useState(false);
     const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
     const [errorState, setErrorState] = useState(false);
-    const [errorMsg, setErrorMsg] = useState(false);
     const [ overlayVisible, setOverlayVisible ] = useState(false);
     const [ overlayMode, setOverlayMode ] = useState("");
     
@@ -115,35 +114,68 @@ export default function AdminUsersTab(props) {
         setUsers(newUserArray);
     }
 
-    
+    function handleFailedResponse (response) {
+        console.log("Handling bad response");
+        setErrorState(true);
+        setLoading(false);
+        switch (response.status) {
+            case 401:
+                //Force a logout.
+                props.showToastMessage("Verify identity","Please log in again");
+                break;
+            case 403:
+                props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
+                break;
+            default:
+                props.showToastMessage("Server error", "An error occurred on the server.", "warning");
+        }
+        console.log(`Errorstate: ${errorState}`);
+    };
+
+ 
     // Load data from the server if necessary
     
-    if (!loaded && !loading && ! errorState) {
+    if (!loaded && !loading && !errorState) {
+        setLoading(true);
+        console.log("loading data");
         let usersLoaded = false;
         let orgsLoaded = false;
-
-        try {
-            getData('/api/users', setUsers)
+        
+        function handleUserSuccess (data) {
+            setUsers(data);
             usersLoaded = true;
-        } catch( error ) {
-            console.log("Error while fetching user data");
-            props.showToastMessage("Error", "Couldn't load the user data");
-            setErrorState(true);
-        };
+        }
 
-        try {
-            getData('/api/org', setOrgs)
+        function handleOrgSuccess(data) {
+            setOrgs(data);
             orgsLoaded = true;
-        } catch( error ) {
-            console.log("Error while fetching org unit data");
-            props.showToastMessage("Error", "Couldn't load the org unit data");
-            setErrorState(true);
-        };
+        }
+
+        getData('/api/users',  handleUserSuccess, null, null, (response) => {
+        console.log("Handling bad response");
+        setErrorState(true);
+        setLoading(false);
+        switch (response.status) {
+            case 401:
+                //Force a logout.
+                props.showToastMessage("Verify identity","Please log in again");
+                break;
+            case 403:
+                props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
+                break;
+            default:
+                props.showToastMessage("Server error", "An error occurred on the server.", "warning");
+        }
+        console.log(`Errorstate: ${errorState}`);
+            
+        });
+
+        getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);
         
         if (usersLoaded && orgsLoaded) {
             setLoaded(true);
+            setLoading(false);
         }
-        setLoading(false);
     }
     
     let overlay;
@@ -162,6 +194,9 @@ export default function AdminUsersTab(props) {
         );
     }
 
+    console.log(`Error state: ${errorState}`);
+    console.log(`Loading: ${loading}`);
+    console.log(`Loaded: ${loaded}`);
 
     
     const tableRows = users.map( (user, index) => {
@@ -199,6 +234,8 @@ export default function AdminUsersTab(props) {
 
     if (!loaded) {
         return <LoadingWidget />;
+    } else if (errorState == true) {
+        return <div></div>;
     } else {
         return (
             <div>

@@ -62,8 +62,18 @@ export default function ProfileScreen(props) {
     
 
     if (!loaded && !loading) {
-        getData('/api/users/self', setTempUser, setLoading, setLoaded)
-            .catch( () => console.log("Error while fetching user data"));
+        getData('/api/users/self', setTempUser, setLoading, setLoaded, (response => {
+                switch (response.status) {
+                    case 401:
+                    case 404:
+                        props.showToastMessage("Verify identity", "Please log in again");
+                        //Discard token and edirect to login screen.
+                        break;
+                    default:
+                        props.showToastMessage("Verify identity", "Please log in again",'warning');
+                }
+            })
+        );
     }
     
     if ( !loaded ) {

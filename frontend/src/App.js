@@ -31,6 +31,9 @@ class App extends React.Component {
         this.setCurrentUser = this.setCurrentUser.bind(this);
         this.test = this.test.bind(this);
 
+    }
+    
+    componentDidMount() {
         this.checkCurrentUser();
     }
 
@@ -70,8 +73,15 @@ class App extends React.Component {
         return (
             <div className="App">
                 <Routes>
-                    <Route path="/login"    element={<LoginScreen setCurrentUser={this.setCurrentUser} />} />
-                    <Route path="/register" element={<RegisterScreen />} />
+                    <Route path="/login" 
+                        element={<LoginScreen setCurrentUser={this.setCurrentUser}
+                        showToastMessage={this.showToastMessage} />} 
+                    />
+                    <Route path="/register"
+                        element={<RegisterScreen
+                        showToastMessage={this.showToastMessage}
+                        />}
+                    />
                     <Route path="/" element={(
                         <PrivateRoute>
                             <MainPageLayout 
@@ -86,10 +96,22 @@ class App extends React.Component {
                             />
                         </PrivateRoute>
                     )}>
-                        <Route path="/home"    element={<HomeScreen />} />
-                        <Route path="/repos"   element={<RepoScreen showToastMessage={this.showToastMessage} />} />
-                        <Route path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage} setCurrentUser={this.setCurrentUser} />} />
-                        <Route path="/admin"   element={<AdminPanel showToastMessage={this.showToastMessage} />} />
+                        <Route path="/home"
+                            element={<HomeScreen />}
+                        />
+                        <Route path="/repos"
+                            element={<RepoScreen
+                                showToastMessage={this.showToastMessage} />} 
+                        />
+                        <Route path="/profile"
+                            element={<ProfileScreen
+                                showToastMessage={this.showToastMessage}
+                                setCurrentUser={this.setCurrentUser} />}
+                        />
+                        <Route path="/admin"
+                            element={<AdminPanel
+                         tf        showToastMessage={this.showToastMessage} />}
+                        />
                     </Route>
                 </Routes>
             </div>

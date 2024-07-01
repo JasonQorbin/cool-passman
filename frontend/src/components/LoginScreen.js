@@ -30,8 +30,14 @@ export default function LoginScreen(props) {
                 navigate('/');
             });
         } else {
-            //Toast error message
-            console.log("Login error");
+            switch (response.status) {
+                case 401:
+                    props.showToastMessage("Login failed", "Please check your username and password", 'warning');
+                    break;
+                default:
+                    props.showToastMessage("Login failed", "Server error", 'warning');
+                    break;
+            }
         }
 
     }

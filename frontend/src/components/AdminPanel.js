@@ -3,7 +3,7 @@ import AdminOrgUnitsTab from './AdminOrgsTab';
 import AdminUsersTab from './AdminUsersTab';
 import { useState } from 'react';
 
-function AdminPanel(){
+function AdminPanel(props){
     const [activePanel, setActivePanel] = useState("Org Units");
     
     function setPanelToOrgs() { setActivePanel("Org Units");}
@@ -13,13 +13,13 @@ function AdminPanel(){
 
     switch (activePanel) {
         case "Org Units":
-            chosenPanel.push(<AdminOrgUnitsTab key="orgs"/>);
+            chosenPanel.push(<AdminOrgUnitsTab key="orgs" showToastMessage={props.showToastMessage}/>);
             break;
         case "Users":
-            chosenPanel.push(<AdminUsersTab key="users" />);
+            chosenPanel.push(<AdminUsersTab key="users" showToastMessage={props.showToastMessage}/>);
             break;
         default:
-            chosenPanel.push(<AdminOrgUnitsTab key="orgs" />);
+            chosenPanel.push(<AdminOrgUnitsTab key="orgs" showToastMessage={props.showToastMessage}/>);
     }
 
     return (

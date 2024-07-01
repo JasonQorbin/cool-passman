@@ -4,17 +4,18 @@
 const express = require('express');
 const orgRouter = express.Router();
 const OrgController = require('../controllers/OrgController');
+const { adminsOnly, adminsAndTheSameUserOnly, authorisedManagersOnly, authorisedUsersOnly } = require('../middleware/authorization');
 
 //Org Units
-orgRouter.get('/', OrgController.getListOfAllOrgs);
-orgRouter.post('/', OrgController.addNewOrg);
-orgRouter.patch('/:orgID', OrgController.renameOrg);
-orgRouter.delete('/:orgID', OrgController.deleteOrg);
+orgRouter.get   ('/',                    OrgController.getListOfAllOrgs);
+orgRouter.post  ('/',       adminsOnly,  OrgController.addNewOrg);
+orgRouter.patch ('/:orgID', adminsOnly,  OrgController.renameOrg);
+orgRouter.delete('/:orgID', adminsOnly,  OrgController.deleteOrg);
 
 //Departments
-orgRouter.get('/:orgID', OrgController.getListOfDepts);
-orgRouter.post('/:orgID', OrgController.addNewDept); 
-orgRouter.patch('/:orgID/:deptID', OrgController.renameDept);
-orgRouter.delete('/:orgID/:deptID', OrgController.deleteDept);
+orgRouter.get   ('/:orgID',         authorisedUsersOnly, OrgController.getListOfDepts);
+orgRouter.post  ('/:orgID',         adminsOnly,          OrgController.addNewDept); 
+orgRouter.patch ('/:orgID/:deptID', adminsOnly,          OrgController.renameDept);
+orgRouter.delete('/:orgID/:deptID', adminsOnly,          OrgController.deleteDept);
 
 module.exports = orgRouter;

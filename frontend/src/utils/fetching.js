@@ -2,61 +2,38 @@
 
 import { sessionTokenKey } from "./constants";
 
-export function getData(url, setData, setLoading, setLoaded, setErrorMsg, setErrorState) {
+export function getData(url, setData, setLoading, setLoaded, errorCallback) {
     const fetchOptions = {
         method : "GET",
         headers : {}
     }
-
+    
+    //If we have been issued a auth token then attach it to the request.
     const authToken = sessionStorage.getItem(sessionTokenKey);
     if (authToken !== undefined) {
         fetchOptions.headers.Authorisation = `Bearer ${authToken}`;
     }
 
-    if (setLoading !== undefined) {
+    if (setLoading) {
         setLoading(true);
     }
-    return new Promise( (resolve, reject) => {
-        fetch(url, fetchOptions)
-            .then( response => {
-                if (response.status == 403) {
-                    throw new Error ("Forbidden");
-
+    
+    fetch(url, fetchOptions).then( response => {
+        if (response.status == 200) {
+            response.json().then( data => { 
+                setData(data);
+                if (setLoading) {
+                    setLoading(false);
                 }
-                if (response.status == 404) {
-                    throw new Error ("Not Found");
+                if (setLoaded) {
+                    setLoaded(true);
                 }
-                if (response.status == 200) {
-                    return response.json();
-                }
-            })
-            .then( 
-                data => { 
-                    setData(data);
-                    if (setLoading !== undefined) {
-                        setLoading(false);
-                    }
-                    if (setLoaded !== undefined) {
-                        setLoaded(true);
-                    }
-                    resolve(true);
-                },
-                error =>{
-                    if (setErrorMsg !== undefined && setErrorState !== undefined) {
-                        if (error.message === "JSON.parse: unexpected character at line 1 column 1 of the JSON data") {
-                            setErrorMsg("JSON Parse error");
-                        }
-                        if (error.message === "Forbidden") {
-                            setErrorMsg("You do not have the correct privileges to view this");
-                        }
-                        if (error.message === "Not Found") {
-                            setErrorMsg("Not implemented yet...");
-                        }
-                        setErrorState(true);
-                    }
-                    reject(false);
-                }
-            );
+            });
+        } else {
+            if (errorCallback) {
+               errorCallback(response); 
+            }
+        }
     });
 }
 
