@@ -69,7 +69,20 @@ class App extends React.Component {
         console.log(this.state);
     }
 
+
+
     render() {
+        const mainPageRoutes = [
+            <Route key="repos" path="/repos" element={<RepoScreen showToastMessage={this.showToastMessage} />} />,
+            (<Route key="profile" path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage}
+                setCurrentUser={this.setCurrentUser} />} />),
+        ];
+
+        if (this.setCurrentUser.role == 'admin') {
+            mainPageRoutes.push(<Route key="admin" path="/admin" element={<AdminPanel showToastMessage={this.showToastMessage} />} />);
+
+        }
+
         return (
             <div className="App">
                 <Routes>
@@ -82,8 +95,8 @@ class App extends React.Component {
                         showToastMessage={this.showToastMessage}
                         />}
                     />
-                    <Route path="/" element={(
-                        <PrivateRoute>
+                    <Route path="/"
+                        element={(<PrivateRoute>
                             <MainPageLayout 
                                 currentUser={this.state.currentUser}
                                 toastVisible={this.state.toastMessageVisible}
@@ -94,24 +107,9 @@ class App extends React.Component {
                                 toastVariant={this.state.toastVariant}
                                 test={this.test}
                             />
-                        </PrivateRoute>
-                    )}>
-                        <Route path="/home"
-                            element={<HomeScreen />}
-                        />
-                        <Route path="/repos"
-                            element={<RepoScreen
-                                showToastMessage={this.showToastMessage} />} 
-                        />
-                        <Route path="/profile"
-                            element={<ProfileScreen
-                                showToastMessage={this.showToastMessage}
-                                setCurrentUser={this.setCurrentUser} />}
-                        />
-                        <Route path="/admin"
-                            element={<AdminPanel
-                         tf        showToastMessage={this.showToastMessage} />}
-                        />
+                        </PrivateRoute>)}
+                    >
+                        {mainPageRoutes}
                     </Route>
                 </Routes>
             </div>
@@ -130,7 +128,7 @@ function MainPageLayout(props) {
                 test={props.test}
             />
             <div className="content-row">
-                <SideBar />
+                <SideBar currentUser={props.currentUser}/>
                 <Outlet />
                 <ToastMessage 
                     show={props.toastVisible}
