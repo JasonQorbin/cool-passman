@@ -49,7 +49,13 @@ export default function RepoScreen(props) {
 
     if (!loaded && !loading) {
         getData('/api/repo', setRepos, setLoading, setLoaded, (response) => {
-                props.showToastMessage("Data error", "Error while fetching repository data",'warning');
+                if (response.status == 401 || response.status == 403) {
+                   props.showToastMessage("Access denied", 
+                    "You don't the correct access privileges for that recseource. Please log in again",'warning');
+                    props.logout();
+                } else {
+                   props.showToastMessage("Data error", "Error while fetching repository data",'warning');
+                }
             }
         );
     }

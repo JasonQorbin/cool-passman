@@ -29,7 +29,7 @@ class App extends React.Component {
         this.changeToastVisibility = this.changeToastVisibility.bind(this);
         this.showToastMessage = this.showToastMessage.bind(this);
         this.setCurrentUser = this.setCurrentUser.bind(this);
-        this.test = this.test.bind(this);
+        this.logout = this.logout.bind(this);
 
     }
     
@@ -65,11 +65,10 @@ class App extends React.Component {
             });
     }
 
-    test() {
-        console.log(this.state);
+    logout() {
+        sessionStorage.removeItem(sessionTokenKey);
+        this.setState({currentUser : null});
     }
-
-
 
     render() {
         const mainPageRoutes = [
@@ -97,7 +96,7 @@ class App extends React.Component {
                         />}
                     />
                     <Route path="/"
-                        element={(<PrivateRoute>
+                        element={(<PrivateRoute currentUser={this.state.currentUser}>
                             <MainPageLayout 
                                 currentUser={this.state.currentUser}
                                 toastVisible={this.state.toastMessageVisible}
@@ -107,6 +106,7 @@ class App extends React.Component {
                                 toastMessage={this.state.toastMessage}
                                 toastVariant={this.state.toastVariant}
                                 test={this.test}
+                                logout={this.logout}
                             />
                         </PrivateRoute>)}
                     >
@@ -126,7 +126,7 @@ function MainPageLayout(props) {
             <PageHeader 
                 currentUser={props.currentUser}
                 showToastMessage={props.showToastMessage}
-                test={props.test}
+                logout={props.logout}
             />
             <div className="content-row">
                 <SideBar currentUser={props.currentUser}/>
@@ -145,8 +145,7 @@ function MainPageLayout(props) {
 
 const PrivateRoute = (props) => {
   const { children } = props
-  const isLoggedIn = sessionStorage.getItem(sessionTokenKey) !== null;
-  const location = useLocation()
+  const isLoggedIn = props.currentUser !== null && sessionStorage.getItem(sessionTokenKey) !== null;
 
   return isLoggedIn ? (
     <>{children}</>
