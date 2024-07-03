@@ -114,8 +114,8 @@ export default function AdminUsersTab(props) {
         setUsers(newUserArray);
     }
 
+
     function handleFailedResponse (response) {
-        console.log("Handling bad response");
         setErrorState(true);
         setLoading(false);
         switch (response.status) {
@@ -130,7 +130,6 @@ export default function AdminUsersTab(props) {
             default:
                 props.showToastMessage("Server error", "An error occurred on the server.", "warning");
         }
-        console.log(`Errorstate: ${errorState}`);
     };
 
  
@@ -140,44 +139,43 @@ export default function AdminUsersTab(props) {
         setLoading(true);
         console.log("loading data");
         let usersLoaded = false;
-        let orgsLoaded = false;
         
         function handleUserSuccess (data) {
             setUsers(data);
             usersLoaded = true;
+            console.log("Users loaded");
         }
 
         function handleOrgSuccess(data) {
             setOrgs(data);
-            orgsLoaded = true;
+            if (usersLoaded) {
+                setLoaded(true);
+                setLoading(false);
+            }
+            console.log("Orgs loaded");
         }
 
         getData('/api/users',  handleUserSuccess, null, null, (response) => {
-        console.log("Handling bad response");
-        setErrorState(true);
-        setLoading(false);
-        switch (response.status) {
-            case 401:
-                //Force a logout.
-                props.showToastMessage("Verify identity","Please log in again");
-                props.logout();
-                break;
-            case 403:
-                props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
-                break;
-            default:
-                props.showToastMessage("Server error", "An error occurred on the server.", "warning");
-        }
-        console.log(`Errorstate: ${errorState}`);
-            
+            console.log("Handling bad response");
+            setErrorState(true);
+            setLoading(false);
+            switch (response.status) {
+                case 401:
+                    //Force a logout.
+                    props.showToastMessage("Verify identity","Please log in again");
+                    props.logout();
+                    break;
+                case 403:
+                    props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
+                    break;
+                default:
+                    props.showToastMessage("Server error", "An error occurred on the server.", "warning");
+            }
+            console.log(`Errorstate: ${errorState}`);
+                
         });
 
         getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);
-        
-        if (usersLoaded && orgsLoaded) {
-            setLoaded(true);
-            setLoading(false);
-        }
     }
     
     let overlay;
@@ -196,11 +194,6 @@ export default function AdminUsersTab(props) {
         );
     }
 
-    console.log(`Error state: ${errorState}`);
-    console.log(`Loading: ${loading}`);
-    console.log(`Loaded: ${loaded}`);
-
-    
     const tableRows = users.map( (user, index) => {
         const accessButtons = [];
         if (user.role !== "admin") {
