@@ -73,7 +73,7 @@ class App extends React.Component {
                 setCurrentUser={this.setCurrentUser} />} />),
         ];
 
-        if (this.setCurrentUser.role == 'admin') {
+        if (this.state.currentUser && this.state.currentUser.role == 'admin') {
             mainPageRoutes.push(<Route key="admin" path="/admin" element={<AdminPanel showToastMessage={this.showToastMessage} />} />);
 
         }

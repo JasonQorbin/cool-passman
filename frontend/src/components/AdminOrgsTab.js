@@ -382,7 +382,7 @@ function AdminOrgUnitsPanel(props) {
     if ( authorisedUsers.length > 0 ) {
         const authorisedUserRows = authorisedUsers.map( user => {
             return (
-                <tr>
+                <tr key={user._id}>
                     <td>{user.firstName} {user.lastName}</td>
                     <td>{user.email}</td>
                     <td>{user.position}</td>

@@ -6,49 +6,52 @@ import { useState } from "react";
 import TransparentOverlay from './TransparentOverlay';
 
 export default function RepoScreen(props) {
-    const [repos, setRepos] = useState([]);
+    const [repoObjects, setRepoObjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
+    const [activeTabIndex, setActiveTabIndex] = useState(0);
     
-    const [errorState, setErrorState] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
     
     function addCredential(orgID, deptID, newCredential) {
-        const newRepos = repos.map( repo => {
-            if (repo.orgID == orgID && repo.deptID == deptID) {
-                repo.repo.push(newCredential);
+        const newRepos = repoObjects.map( currentObject => {
+            if (currentObject.orgID == orgID && currentObject.deptID == deptID) {
+                currentObject.repo.push(newCredential);
             }
-            return repo;
+            return currentObject;
         });
 
-        setRepos(newRepos);
+        setRepoObjects(newRepos);
     }
     
     
     function updateCredential( orgID, deptID, index, newCredential ) {
-        const newRepos = repos.map( repo => {
-            if (repo.orgID == orgID && repo.deptID == deptID) {
-                repo.repo[index] = newCredential;
+        const newRepos = repoObjects.map( currentObject => {
+            if (currentObject.orgID == orgID && currentObject.deptID == deptID) {
+                currentObject.repo[index] = newCredential;
             }
-            return repo;
+            return currentObject;
         });
 
-        setRepos(newRepos);
+        setRepoObjects(newRepos);
     }
 
     function deleteCredential( orgID, deptID, index ) {
-        const newRepos = repos.map( repo => {
-            if (repo.orgID == orgID && repo.deptID == deptID) {
-                repo.repo.splice(index, 1);
+        const newRepos = repoObjects.map( currentObject => {
+            if (currentObject.orgID == orgID && currentObject.deptID == deptID) {
+                currentObject.repo.splice(index, 1);
             }
-            return repo;
+            return currentObject;
         });
 
-        setRepos(newRepos);
+        setRepoObjects(newRepos);
+    }
+
+    function changeTab(event) {
+        setActiveTabIndex(event.target.value);
     }
 
     if (!loaded && !loading) {
-        getData('/api/repo', setRepos, setLoading, setLoaded, (response) => {
+        getData('/api/repo', setRepoObjects, setLoading, setLoaded, (response) => {
                 if (response.status == 401 || response.status == 403) {
                    props.showToastMessage("Access denied", 
                     "You don't the correct access privileges for that recseource. Please log in again",'warning');
@@ -63,11 +66,17 @@ export default function RepoScreen(props) {
     if (!loaded) {
         return <LoadingWidget />
     } else {
-        if (repos.length >0 ) {
+        const repoTabButtons = repoObjects.map( (currentObject, index) => {
+            return <button key={index} value={index} onClick={changeTab}>{currentObject.orgName} | {currentObject.deptName}</button>
+        });
+        if (repoObjects.length >0 ) {
             return (
                 <div>
+                    <div>
+                        {repoTabButtons}
+                    </div>
                     <RepoTab
-                        repo={repos[0]}
+                        repoObject={repoObjects[activeTabIndex]}
                         addCredential={addCredential}
                         showToastMessage={props.showToastMessage}
                         updateCachedCredential={updateCredential}
@@ -105,10 +114,10 @@ function RepoTab(props) {
     }
 
     function createCredentialOnServer( credential ) {
-        postData(`/api/repo/${props.repo.orgID}/${props.repo.deptID}`, credential, (response) => {
+        postData(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}`, credential, (response) => {
             if (response.status === 200) {
                 response.json().then( newCredential => {
-                    props.addCredential(props.repo.orgID, props.repo.deptID, newCredential);
+                    props.addCredential(props.repoObject.orgID, props.repoObject.deptID, newCredential);
                 });
             } else {
                 props.showToastMessage("Error", "Couldn't create new credential", 'warning');
@@ -118,11 +127,11 @@ function RepoTab(props) {
     }
 
     function changeCredentialOnServer( credential ) {
-        const credentialID = props.repo.repo[selectedIdx]._id;
-        putData(`/api/repo/${props.repo.orgID}/${props.repo.deptID}/${credentialID}`, credential, (response) => {
+        const credentialID = props.repoObject.repo[selectedIdx]._id;
+        putData(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}/${credentialID}`, credential, (response) => {
             if (response.status === 200) {
                 response.json().then( newCredential => {
-                    props.updateCachedCredential(props.repo.orgID, props.repo.deptID, credentialID, newCredential);
+                    props.updateCachedCredential(props.repoObject.orgID, props.repoObject.deptID, credentialID, newCredential);
                 });
             } else {
                 props.showToastMessage("Error", `Couldn't modify credential on the server`, 'warning');
@@ -132,11 +141,11 @@ function RepoTab(props) {
     }
 
     function deteleSelectedCredentialOnServer () {
-        const credentialID = props.repo.repo[selectedIdx]._id;
+        const credentialID = props.repoObject.repo[selectedIdx]._id;
 
-        deleteResource(`/api/repo/${props.repo.orgID}/${props.repo.deptID}/${credentialID}`, (response) => {
+        deleteResource(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}/${credentialID}`, (response) => {
             if (response.status === 200) {
-                props.deleteCachedCredential(props.repo.orgID, props.repo.deptID, selectedIdx);
+                props.deleteCachedCredential(props.repoObject.orgID, props.repoObject.deptID, selectedIdx);
             } else {
                 props.showToastMessage("Error", `Couldn't modify credential on the server`, 'warning');
             }
@@ -146,7 +155,7 @@ function RepoTab(props) {
 
 
 
-    const repoTableRows = props.repo.repo.map( 
+   const repoTableRows = props.repoObject.repo.map( 
         (credential, index) => {
            return ( 
                 <tr key={index}
@@ -182,7 +191,7 @@ function RepoTab(props) {
                     <CredentialInputForm
                         cancelCallback={hideOverlay}
                         submitCallback={changeCredentialOnServer}
-                        credential={props.repo.repo[selectedIdx]}
+                        credential={props.repoObject.repo[selectedIdx]}
                     />
                  </TransparentOverlay>
                 );
