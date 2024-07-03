@@ -67,7 +67,7 @@ export default function ProfileScreen(props) {
                     case 401:
                     case 404:
                         props.showToastMessage("Verify identity", "Please log in again");
-                        //Discard token and edirect to login screen.
+                        props.logout();
                         break;
                     default:
                         props.showToastMessage("Verify identity", "Please log in again",'warning');

@@ -1,16 +1,16 @@
 import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import PageHeader from "./components/PageHeader";
 import SideBar from "./components/SideBar"; 
 import LoginScreen from "./components/LoginScreen";
 import RegisterScreen from "./components/RegisterScreen";
-import HomeScreen from "./components/HomeScreen";
 import AdminPanel from "./components/AdminPanel";
 import RepoScreen from "./components/RepoScreen";
 import ProfileScreen from "./components/ProfileScreen";
 import ToastMessage from "./components/ToastMessage";
+import LoadingWidget from "./components/LoadingWidget";
 import { sessionTokenKey } from "./utils/constants";
 import { getData } from "./utils/fetching";
 
@@ -23,7 +23,6 @@ class App extends React.Component {
             toastTitle : "",
             toastMessage : "",
             toastVariant : "primary",
-            
         };
 
         this.changeToastVisibility = this.changeToastVisibility.bind(this);
@@ -33,10 +32,6 @@ class App extends React.Component {
 
     }
     
-    componentDidMount() {
-        this.checkCurrentUser();
-    }
-
     checkCurrentUser() {
         if (sessionStorage.getItem(sessionTokenKey) && !this.state.currentUser) {
             getData('/api/users/self', this.setCurrentUser);
@@ -82,13 +77,14 @@ class App extends React.Component {
             mainPageRoutes.push(<Route key="admin" path="/admin" element={<AdminPanel showToastMessage={this.showToastMessage} />} />);
 
         }
-
+        
         return (
             <div className="App">
                 <Routes>
                     <Route path="/login" 
                         element={<LoginScreen setCurrentUser={this.setCurrentUser}
-                        showToastMessage={this.showToastMessage} />} 
+                        showToastMessage={this.showToastMessage} 
+                        currentUser={this.state.currentUser} />} 
                     />
                     <Route path="/register"
                         element={<RegisterScreen
@@ -99,6 +95,7 @@ class App extends React.Component {
                         element={(<PrivateRoute currentUser={this.state.currentUser}>
                             <MainPageLayout 
                                 currentUser={this.state.currentUser}
+                                setCurrentUser={this.setCurrentUser}
                                 toastVisible={this.state.toastMessageVisible}
                                 changeToastVisibility={this.changeToastVisibility}
                                 showToastMessage={this.showToastMessage}
@@ -121,6 +118,29 @@ class App extends React.Component {
 export default App;
 
 function MainPageLayout(props) {
+    
+    const [loadingUser, setLoadingUser] = useState(false);
+
+    function loadCurrentUser() {
+        setLoadingUser(true);
+        getData('/api/users/self',
+            data => {
+                props.setCurrentUser(data);
+                setLoadingUser(false);
+            });
+    }
+
+    if (!props.currentUser) {
+        if (!loadingUser) {
+            setLoadingUser(true);
+            loadCurrentUser();
+        }
+    }
+
+    if (loadingUser) {
+        return <LoadingWidget />;
+    }
+
     return (
         <div>
             <PageHeader 
@@ -145,7 +165,7 @@ function MainPageLayout(props) {
 
 const PrivateRoute = (props) => {
   const { children } = props
-  const isLoggedIn = props.currentUser !== null && sessionStorage.getItem(sessionTokenKey) !== null;
+  const isLoggedIn = sessionStorage.getItem(sessionTokenKey) !== null;
 
   return isLoggedIn ? (
     <>{children}</>

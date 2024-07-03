@@ -17,17 +17,22 @@ export default function LoginScreen(props) {
     }
 
     function handleLoginResponse(response, objectSent) {
+        console.log('Response');
+        console.log(response);
+
         if (response.status === 200) {
             response.json().then( body => {
+                console.log(body);
+                console.log(props.currentUser);
                 sessionStorage.setItem(sessionTokenKey, body.token);
 
                 //After getting and caching the token, fetch the current user in order to display their name on the
                 //main page header.
                 getData('/api/users/self', (data) => {
                     props.setCurrentUser(data);
+                    navigate('/');
                 }); //Todo: Handled errors on this GET operation.
                 
-                navigate('/');
             });
         } else {
             switch (response.status) {

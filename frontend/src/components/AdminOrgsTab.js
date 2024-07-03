@@ -54,7 +54,9 @@ function AdminOrgUnitsPanel(props) {
         getData(`/api/users/list-users/${selectedOrg}/${newDept}`, setAuthorisedUsers, null, null,(response) =>{
             switch (response.status) {
                 case 401:
-                    //Token may be bad. Make the user log in again
+                    //Force a logout.
+                    props.showToastMessage("Verify identity","Please log in again");
+                    props.logout();
                     break;
                 case 403:
                     props.showToastMessage("Error", "You don't have the correct privileges to perform this action", "danger");

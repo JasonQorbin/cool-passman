@@ -1,12 +1,24 @@
 const jwt = require('jsonwebtoken');
 const { userModel } = require('../models/users');
 const StatusCodes = require('../utils/http-codes');
+const bcrypt = require('bcrypt');
 
 //JWT Secret:
 //It's ok to just use a default here because we've already checked that the variables have been setup properly in
 //index.js and would have ended the process we were trying to run in production without a proper secret. This 
 //allows us to use a proper secret for testing if we have one and continue testing with a default if not.
 let jwtSecret = process.env.TOKEN_SECRET || "Testing_Secret";
+
+/** Number of salting rounds for the bcrypt hash. 14rounds -> ~1.5sec/hash on a 2Ghz processor */
+const numberOfSaltRounds = 14;
+
+function generatePasswordHash(password) {
+    bcrypt.hash(password, numberOfSaltRounds);
+}
+
+function verifyPasswordHash(password, hash) {
+    return bcrypt.compare(password, hash);
+}
 
 /**
  * Signs the given payload with the secret using HMAC + SHA256 and returns the token.
@@ -61,8 +73,6 @@ async function authenticateUser( request, response ) {
     const emailReceived = request.body.email;
     const passwordReceived = request.body.password;
     
-    const hashedPassword = passwordReceived //Todo: Hash the password to match the database.
-
     const userDoc = await userModel.findOne({email : emailReceived});
 
     if (userDoc === null) {
@@ -70,17 +80,20 @@ async function authenticateUser( request, response ) {
         authenticationFailed(response);
         return;
     }
+   
+    verifyPasswordHash(passwordReceived, userDoc.password).then( matchResult => {
+        if (!matchResult) {
+            console.log(`Login failed due to incorrect password ${request.body.email} : ${request.body.password}`);
+            authenticationFailed(response);
+            return;
+        } else {
 
-    if (userDoc.password !== hashedPassword) {
-        console.log(`Login failed due to incorrect password ${request.body.email} : ${request.body.password}`);
-        authenticationFailed(response);
-        return;
-    }
-    
-    const generatedToken = createTokenFromUser(userDoc);
-    response.status(StatusCodes.SUCCESS)
-            .send({ "token" : generatedToken})
-            .end();
+            const generatedToken = createTokenFromUser(userDoc);
+            response.status(StatusCodes.SUCCESS)
+                .send({ "token" : generatedToken})
+                .end();
+        }
+    });
 }
 
 async function registerNewUser( request, response ) {
@@ -93,34 +106,36 @@ async function registerNewUser( request, response ) {
         response.status(StatusCodes.BAD_REQUEST).end();
         return;
     }
+    generatePasswordHash(request.body.password).then( hashedPassword => {
+        const newUser = new userModel({
+            firstName : request.body.firstName,
+            lastName : request.body.lastName,
+            email : request.body.email,
+            password : hashedPassword,
+            authorised_repos: []
+        });
 
-    const newUser = new userModel({
-        firstName : request.body.firstName,
-        lastName : request.body.lastName,
-        email : request.body.email,
-        password : request.body.password,
-        authorised_repos: []
-    });
-
-    if (request.body.hasOwnProperty('position')) {
-        newUser.position = request.body.position;
-    }
-    
-    try {
-        const savedUser = await newUser.save();
-        const token = createTokenFromUser(savedUser);
-
-        response.status(StatusCodes.CREATED)
-            .send({"token" : token });
-    } catch (error) {
-        if (error.code == 11000) {
-            console.error("Duplicate key error:", error);
-            response.status(StatusCodes.CONFLICT).end();
-        } else {
-            console.error("Database error:", error);
-            response.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+        if (request.body.hasOwnProperty('position')) {
+            newUser.position = request.body.position;
         }
-    }
+
+        try {
+            newUser.save().then(savedUser=> {
+            const token = createTokenFromUser(savedUser);
+
+            response.status(StatusCodes.CREATED)
+                .send({"token" : token });
+            });
+        } catch (error) {
+            if (error.code == 11000) {
+                console.error("Duplicate key error:", error);
+                response.status(StatusCodes.CONFLICT).end();
+            } else {
+                console.error("Database error:", error);
+                response.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+            }
+        }
+    });
 }
 
 async function changePassword( request, response ) {
@@ -135,7 +150,7 @@ async function changePassword( request, response ) {
             console.log(`[WARN] Change Password: Could not verify old password`);
             request.status(StatusCodes.BAD_REQUEST).send({error: "Old password incorrect"});
         } else {
-            userDoc.password = request.body.newPassword;
+            userDoc.password = generatePasswordHash(request.body.newPassword);
             await userDoc.save();
             response.status(StatusCodes.SUCCESS).end();
         }
@@ -155,5 +170,7 @@ module.exports = {
     authenticateUser,
     registerNewUser,
     verifyAndDecodeToken,
-    changePassword
+    changePassword,
+    generatePasswordHash,
+    verifyPasswordHash
 }

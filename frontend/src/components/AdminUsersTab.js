@@ -122,6 +122,7 @@ export default function AdminUsersTab(props) {
             case 401:
                 //Force a logout.
                 props.showToastMessage("Verify identity","Please log in again");
+                props.logout();
                 break;
             case 403:
                 props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
@@ -159,6 +160,7 @@ export default function AdminUsersTab(props) {
             case 401:
                 //Force a logout.
                 props.showToastMessage("Verify identity","Please log in again");
+                props.logout();
                 break;
             case 403:
                 props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
