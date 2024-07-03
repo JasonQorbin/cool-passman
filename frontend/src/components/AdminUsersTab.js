@@ -5,6 +5,9 @@ import { getData, patchData, deleteResource } from "../utils/fetching";
 import RepoAccessForm from './RepoAccessForm';
 import TransparentOverlay from './TransparentOverlay';
 
+/**
+ * Component for the User tab on the admin panel.
+ */
 export default function AdminUsersTab(props) {
     const [users, setUsers] = useState([]);
     const [orgs, setOrgs] = useState([]);
@@ -30,15 +33,24 @@ export default function AdminUsersTab(props) {
         }
     }
 
+    /**
+     * Callback function for the button to delete a user. Triggers an API call.
+     *
+     * @param event The button click event. Used to find the specific user account referred to.
+     */
     function deleteUserButtonPress(event) {
         deleteResource(`/api/users/${event.target.value}`, handleDeleteResponse);
     }
-
+    
+    /**
+     * Handles the response from the server after deleting a user. Updates the local cache to reflect the change
+     * to avoid having to fetch the full user list again.
+     *
+     * @param response The response from the server
+     */
     function handleDeleteResponse(response) {
         if (response.status == 200) {
             response.json().then( data => {
-                console.log("Deleted user:");
-                console.log(data);
                 let positionToDelete = -1;
                 for (let i = 0; i < users.length; i++) {
                     if (users[i]._id == data._id) {
@@ -56,7 +68,12 @@ export default function AdminUsersTab(props) {
             });
         }
     }
-
+    
+    /**
+     * Callback function for the button to increase a user's access level.
+     *
+     * @param event The button click event. Used to find the specific user account referred to.
+     */
     function increaseAccessLevel(event) {
         const user = getUserFromID(event.target.value);
         const newRole = user.role === 'manager' ? 'admin' : 'manager';
@@ -65,7 +82,11 @@ export default function AdminUsersTab(props) {
         patchData(`/api/users/${user._id}`, objectToSend, handleRoleChangeResponse);
     }
 
-
+    /**
+     * Callback function for the button to decrease a user's access level.
+     *
+     * @param event The button click event. Used to find the specific user account referred to.
+     */
     function decreaseAccessLevel(event) {
         const user = getUserFromID(event.target.value);
         const newRole = user.role === 'manager' ? 'user' : 'manager';
@@ -73,7 +94,12 @@ export default function AdminUsersTab(props) {
         const objectToSend = { role: newRole};
         patchData(`/api/users/${user._id}`, objectToSend, handleRoleChangeResponse);
     }
-
+    
+    /**
+     * Handles the response from the server after modifying a user's role.
+     *
+     * @param response The response from the server
+     */
     function handleRoleChangeResponse(response) {
         if (response.status === 200) {
             response.json().then( data => {
@@ -87,22 +113,47 @@ export default function AdminUsersTab(props) {
                 setUsers(newUsers);
             });
         } else {
-            //Toast the error message.
+            switch (response.status) {
+                case 401:
+                    //Force a logout.
+                    props.showToastMessage("Verify identity","Please log in again");
+                    props.logout();
+                    break;
+                case 403:
+                    props.showToastMessage("Access denied", "You don't have the correct privileges to perform this action", "danger");
+                    break;
+                default:
+                    props.showToastMessage("Server error", "An error occurred on the server.", "warning");
+            }
         }
     }
-
+    
+    /**
+     * Hides the transparent overlay form.
+     */
     function hideOverlay() {
         setOverlayVisible(false);
         setSelectedUserIndex(-1);
     }
-
+    
+    /**
+     * Displays the transparent overlay form for adding/removing access to repos for a selected user.
+     *
+     * @param {*} event The click event to find the table entry that was selected.
+     */
     function openRepoAccessOverlay(event) {
         const index = event.target.value;
 
         setSelectedUserIndex(index);
         setOverlayVisible(true);
     }
-
+    
+    /**
+      * After a successful change to a user on the server, this function updates the local cached user values to match
+      * so that the application doesn't need to hit the server with another download again.
+      *
+      * @param The user object that was updated on the server.
+      */
     function updateUser(newUser) {
         const newUserArray = users.map(item => {
             if (item._id === newUser._id) {
@@ -114,7 +165,12 @@ export default function AdminUsersTab(props) {
         setUsers(newUserArray);
     }
 
-
+    /**
+      * Handles the situations where the loading of data from the server fails due by displaying an appropriate message
+      * and forcing a logout if needed.
+      *
+      * @param response The response from the server. Used to check the response code.
+      */
     function handleFailedResponse (response) {
         setErrorState(true);
         setLoading(false);
@@ -178,6 +234,7 @@ export default function AdminUsersTab(props) {
         getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);
     }
     
+    //Popluate the overlay form if required.
     let overlay;
     if ( !overlayVisible ) {
         overlay = <div></div>;
@@ -193,6 +250,8 @@ export default function AdminUsersTab(props) {
         </TransparentOverlay>
         );
     }
+
+    //Create the table row elements that contain the user records.
 
     const tableRows = users.map( (user, index) => {
         const accessButtons = [];
