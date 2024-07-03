@@ -3,6 +3,9 @@ import AdminOrgUnitsTab from './AdminOrgsTab';
 import AdminUsersTab from './AdminUsersTab';
 import { useState } from 'react';
 
+/**
+  * Component for the Admin area. Contains two other components that represent the Org and User tabs.
+  */
 function AdminPanel(props){
     const [activePanel, setActivePanel] = useState("Org Units");
     

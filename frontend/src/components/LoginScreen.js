@@ -5,7 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 export default function LoginScreen(props) {
     const navigate = useNavigate();
- 
+    
+    /**
+      * Handles the submit event on the login form. Trigger the appropriate API call to authenticate the
+      * credentials provided.
+      *
+      * @param {Event} event Submit event from the login form. Used to stop the default submit behaviour. 
+      */
     function handleLogin(event) {
         event.preventDefault();
         const email = document.getElementById("login-email-field").value;
@@ -15,15 +21,21 @@ export default function LoginScreen(props) {
 
         postData('/api/login', loginObject, handleLoginResponse);
     }
-
+    
+    /**
+      * Handles the response from the server to the login request. On success it saves the Auth 
+      * token in session storage. It then fetches the authenticated user profile from the
+      * server using the token and caches it in the application state.
+      *
+      * On failure, it displays a toast message saying what's wrong.
+      *
+      * @param {object} response The response object from the server.
+      * @param {object} objectSent The object that was initially sent.
+      */
     function handleLoginResponse(response, objectSent) {
-        console.log('Response');
-        console.log(response);
 
         if (response.status === 200) {
             response.json().then( body => {
-                console.log(body);
-                console.log(props.currentUser);
                 sessionStorage.setItem(sessionTokenKey, body.token);
 
                 //After getting and caching the token, fetch the current user in order to display their name on the

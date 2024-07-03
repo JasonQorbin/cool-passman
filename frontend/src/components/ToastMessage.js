@@ -2,6 +2,10 @@ import '../styles/ToastMessage.css';
 
 import Toast from 'react-bootstrap/Toast';
 
+/**
+  * Wrapper component for the Bootstrap toast message. Displays message with a configurable title,
+  * body and colour variant and automatically disappears after 3 seconds.
+  */
 function ToastMessage(props) {
     return (
         <Toast 

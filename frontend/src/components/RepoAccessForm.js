@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { isAccordionItemSelected } from 'react-bootstrap/esm/AccordionContext';
 import { patchData } from '../utils/fetching';
 
+/**
+  * Form displayed in an overlay window that allows admin to change the access privileges of
+  * other users.
+  */
 export default function RepoAccessForm(props) {
     const [ deptChoices, setDeptChoices ] = useState([]);
 
@@ -11,7 +14,11 @@ export default function RepoAccessForm(props) {
     for (const org of props.orgs) {
         orgOptions.push(<option key={org._id} value={org._id}>{org.name}</option>);
     }
-
+    
+    /**
+      * Updates the options in the drop-down menu for departments when the select of the OU drop-down
+      * menu changes.
+      */
     function updateDepartmentChoices() {
         const newList = [];
         newList.push(<option value="">---</option>);
@@ -36,7 +43,17 @@ export default function RepoAccessForm(props) {
         }
         setDeptChoices(newList);
     }
-
+    
+    /**
+      * Reads through the authorised repos list of the given user to to find out if they has access
+      * privileges on the given department and OU.
+      *
+      * @param {object} user The user to check
+      * @param {string} orgID The id number of the OU.
+      * @param {string} deptID The id number of the department
+      *
+      * @returns true if the user has access.
+      */
     function userAuthorisedOnDept(user, orgID, deptID) {
         let answer = false;
 
@@ -49,6 +66,11 @@ export default function RepoAccessForm(props) {
         return answer;
     }
 
+    /**
+      * Callback for the Add button. Triggers an api call to add access to the selected department for the current user.
+      *
+      * Also updates the local cached data on success.
+      */
     function addDepartmentAccess() {
         const selectedOrg = document.getElementById('org-selector').value;
         const selectedDept = document.getElementById('dept-selector').value;
@@ -91,6 +113,11 @@ export default function RepoAccessForm(props) {
                 }
             }
 
+            /**
+            * Callback for the Remove button. Triggers an api call to remove access from the selected department for the current user.
+            *
+            * Also updates the local cached data on success.
+            */
             function removeAccess() {
                 const url = `/api/users/${props.selectedUser._id}/remove_dept`;
                 const body = { orgID : org._id, deptID : dept._id};

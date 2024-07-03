@@ -2,11 +2,20 @@ import { useState } from 'react';
 import { getData, putData, patchData } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 
+/**
+  * Component for the user profile screen. Allows the user to edit their details and change 
+  * their password.
+  */
 export default function ProfileScreen(props) {
     const [ tempUser, setTempUser ] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
     
+    /**
+      * Validates the user profile form and sends an API call to update the user.
+      *
+      * @param {Event} event The form submit event to stop default behavior.
+      */
     function sendUserUpdateToServer(event) {
         event.preventDefault();
         const userToSend = {
@@ -28,6 +37,11 @@ export default function ProfileScreen(props) {
         });
     }
 
+    /**
+      * Validates the password change form and sends an API call to chang ethe password.
+      *
+      * @param {Event} event The form submit event to stop default behavior.
+      */
     function requestPasswordChange(event) {
         event.preventDefault();
         const passwordElement1 = document.getElementById("new-password-field");
@@ -51,7 +65,10 @@ export default function ProfileScreen(props) {
             });
         }
     }
-
+    /**
+      * Custom validation function for the password form that ensures that new password and the 
+      * confirmation field have the same value.
+      */
     function resetPasswordValidation() {
         const passwordElement1 = document.getElementById("new-password-field");
         const passwordElement2 = document.getElementById("new-password-confirm-field");
@@ -60,6 +77,7 @@ export default function ProfileScreen(props) {
         passwordElement2.setCustomValidity("");
     }
     
+    //Load the user profile to change.
 
     if (!loaded && !loading) {
         getData('/api/users/self', setTempUser, setLoading, setLoaded, (response => {

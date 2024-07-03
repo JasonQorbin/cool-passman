@@ -1,5 +1,8 @@
 import '../styles/PageHeader.css';
 
+/**
+  * Component for the page header in the Main Page Layout
+  */
 function PageHeader(props) {
     const currentUserName = props.currentUser ? `${props.currentUser.firstName} ${props.currentUser.lastName}` : "";
     

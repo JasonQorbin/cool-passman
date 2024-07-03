@@ -3,10 +3,21 @@ import { postData } from '../utils/fetching';
 import { useNavigate } from "react-router-dom";
 const requiredPasswordLength = 8;
 
+/**
+ * Component for the new user registration screen
+ */
 export default function RegisterScreen() {
     
     const navigate = useNavigate();
-
+    
+    /**
+      * Ovverides the default form submission behaviour to perform additional validation before
+      * making an api call to create the new user.
+      *
+      * The extra validation is to ensure the password field and password confirmation fields match
+      *
+      * @param {Event} event The submit event for form.
+      */
     function validateFormAndSubmit(event) {
         const firstNameField = document.getElementById("registration-firstname-field");
         const lastNameField = document.getElementById("registration-lastname-field");
@@ -35,16 +46,32 @@ export default function RegisterScreen() {
 
     }
 
+    /**
+      * If the custom validation on the password fields was previously triggered, this function 
+      * clears the validation error message. This function is assigned as the onChange event 
+      * handler on the 2 password fields.
+      */
     function resetPasswordErrorState() {
         const passwordElement2 = document.getElementById("registration-password-confirmation-field");
         passwordElement2.setCustomValidity("");
     }
 
+    /**
+      * Makes the API call to the server to create the new user.
+      *
+      * @param {object} userToPost A JSON object with the user fields to insert in the body of the request.
+      */
     function sendRegisterRequestToServer(userToPost) {
         const url = '/api/users';
         postData(url, userToPost, handleRegisterResponse);
     }
 
+    /**
+      * Handles the response from the server to the registration API call.
+      *
+      * @param {object} response The response from the server. On success will contain an Auth token.
+      * @param {object} postedObject The user object that was sent.
+      */
     function handleRegisterResponse(response, postedObject) {
         if (response.status == 201) {
             //Save the token to session data. Then redirect to the home page.

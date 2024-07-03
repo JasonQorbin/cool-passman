@@ -1,3 +1,8 @@
+/**
+ * Component that displays a single text input in the centre of the screen with a darkened
+ * background over the other page content. Accepts a callbackfunction that it will passed the 
+ * submitted value into.
+ */
 export default function TransparentTextInputOverlay(props) {
     function submitValue(event) {
         event.preventDefault();
