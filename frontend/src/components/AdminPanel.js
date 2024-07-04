@@ -24,11 +24,23 @@ function AdminPanel(props){
         default:
             chosenPanel.push(<AdminOrgUnitsTab key="orgs" showToastMessage={props.showToastMessage}/>);
     }
+    
+    const tabButtons = []
+    const tabHeadClass = "tab-head";
+    const selectedTabHeadClass = "tab-head selected";
 
+    if (activePanel === "Org Units") {
+        tabButtons.push(<button key="org" className={selectedTabHeadClass} onClick={setPanelToOrgs}>Org Units</button>);
+        tabButtons.push(<button key="users" className={tabHeadClass} onClick={setPanelToUsers}>Users</button>);
+    } else {
+        tabButtons.push(<button key="org" className={tabHeadClass} onClick={setPanelToOrgs}>Org Units</button>);
+        tabButtons.push(<button key="users" className={selectedTabHeadClass} onClick={setPanelToUsers}>Users</button>);
+    }
     return (
-        <div>
-            <button onClick={setPanelToOrgs}>Org Units</button>
-            <button onClick={setPanelToUsers}>Users</button>
+        <div className="content-wrapper">
+            <div className="tab-head-container">
+                {tabButtons}
+            </div>
             {chosenPanel}            
         </div>
     );

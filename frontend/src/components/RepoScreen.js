@@ -69,8 +69,8 @@ export default function RepoScreen(props) {
       *
       * @param {Event} event Click event to find the tab header that was clicked.
       */
-    function changeTab(event) {
-        setActiveTabIndex(event.target.value);
+    function changeTab(index) {
+        setActiveTabIndex(index);
     }
 
     //Load repo data if needed.
@@ -92,12 +92,26 @@ export default function RepoScreen(props) {
         return <LoadingWidget />
     } else {
         const repoTabButtons = repoObjects.map( (currentObject, index) => {
-            return <button key={index} value={index} onClick={changeTab}>{currentObject.orgName} | {currentObject.deptName}</button>
+            let classes = "tab-head";
+            if ( activeTabIndex == index ) {
+                classes = classes + " selected";
+            }
+
+            return (
+                <button 
+                    key={index}
+                    value={index}
+                    className={classes}
+                    onClick={()=>{changeTab(index)}}><div>
+                        <p>{currentObject.orgName}</p><p>{currentObject.deptName}</p></div>
+                </button>
+            )
         });
         if (repoObjects.length >0 ) {
+                console.log(`index: ${activeTabIndex}`);
             return (
-                <div>
-                    <div>
+                <div className="content-wrapper">
+                    <div className="tab-head-container">
                         {repoTabButtons}
                     </div>
                     <RepoTab

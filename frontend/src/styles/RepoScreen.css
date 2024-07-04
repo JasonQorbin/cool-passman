@@ -1,3 +1,4 @@
+/*
 table.repo-table {
     border-collapse : collapse;
     margin : 30px;
@@ -16,4 +17,10 @@ table.repo-table tbody tr:hover {
 
 table.repo-table tbody tr.selected {
     background : lightsalmon;
+}
+
+*/
+
+.repo-name-col, .repo-url-col, .repo-username-col, .repo-password-col {
+    min-width: 250px;
 }

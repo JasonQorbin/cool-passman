@@ -8,15 +8,15 @@ import CredentialInputForm from './CredentialInputForm';
  * department's repository. Serves as the content on one tab in the "My Repositories" screen.
  */
 export default function RepoTab(props) {
-    
-    const [ selectedIdx, setSelectedIdx ] = useState(-1);
-    const [ overlayVisible, setOverlayVisible ] = useState(false);
-    const [ overlayMode, setOverlayMode ] = useState("");
-    
+
+    const [selectedIdx, setSelectedIdx] = useState(-1);
+    const [overlayVisible, setOverlayVisible] = useState(false);
+    const [overlayMode, setOverlayMode] = useState("");
+
     /**
       * Callback for the Add Item button. Displays the input form in 'add' mode.
       */
-    function getNewCredentialInput(){
+    function getNewCredentialInput() {
         setOverlayMode("add");
         setOverlayVisible(true);
     }
@@ -24,7 +24,7 @@ export default function RepoTab(props) {
     /**
       * Callback for the Edit Item button. Displays the input form in 'edit' mode.
       */
-    function getCredentialEdit(){
+    function getCredentialEdit() {
         setOverlayMode("edit");
         setOverlayVisible(true);
     }
@@ -43,10 +43,10 @@ export default function RepoTab(props) {
       *
       * @param {object} credential Contains the fields of a credential record. 
       */
-    function createCredentialOnServer( credential ) {
+    function createCredentialOnServer(credential) {
         postData(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}`, credential, (response) => {
             if (response.status === 200) {
-                response.json().then( newCredential => {
+                response.json().then(newCredential => {
                     props.addCredential(props.repoObject.orgID, props.repoObject.deptID, newCredential);
                 });
             } else {
@@ -61,11 +61,11 @@ export default function RepoTab(props) {
       *
       * @param {object} credential Contains the fields of a credential record. 
       */
-    function changeCredentialOnServer( credential ) {
+    function changeCredentialOnServer(credential) {
         const credentialID = props.repoObject.repo[selectedIdx]._id;
         putData(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}/${credentialID}`, credential, (response) => {
             if (response.status === 200) {
-                response.json().then( newCredential => {
+                response.json().then(newCredential => {
                     props.updateCachedCredential(props.repoObject.orgID, props.repoObject.deptID, credentialID, newCredential);
                 });
             } else {
@@ -78,7 +78,7 @@ export default function RepoTab(props) {
     /**
       * Triggers an API call to delete a credential on the server.
       */
-    function deteleSelectedCredentialOnServer () {
+    function deteleSelectedCredentialOnServer() {
         const credentialID = props.repoObject.repo[selectedIdx]._id;
 
         deleteResource(`/api/repo/${props.repoObject.orgID}/${props.repoObject.deptID}/${credentialID}`, (response) => {
@@ -93,11 +93,11 @@ export default function RepoTab(props) {
 
 
 
-   const repoTableRows = props.repoObject.repo.map( 
+    const repoTableRows = props.repoObject.repo.map(
         (credential, index) => {
-           return ( 
+            return (
                 <tr key={index}
-                    onClick={()=> setSelectedIdx(index)}
+                    onClick={() => setSelectedIdx(index)}
                     className={selectedIdx == index ? "selected" : ""}>
                     <td>{credential.name}</td>
                     <td>{credential.url}</td>
@@ -107,50 +107,50 @@ export default function RepoTab(props) {
             );
         }
     )
-    
+
     const repoEditButtons = [];
-    repoEditButtons.push( <button key="add" onClick={getNewCredentialInput}>Add Item</button> );
-    
+    repoEditButtons.push(<button key="add" onClick={getNewCredentialInput}>Add Item</button>);
+
     //Todo: Restrict these buttons to only Managers and Admins
     if (selectedIdx > -1 && props.currentUser.role != 'user') {
-        repoEditButtons.push( <button key="edit" onClick={getCredentialEdit}>Edit Item</button> );
-        repoEditButtons.push( <button key="delete" onClick={deteleSelectedCredentialOnServer}>Delete Item</button> );
+        repoEditButtons.push(<button key="edit" onClick={getCredentialEdit}>Edit Item</button>);
+        repoEditButtons.push(<button key="delete" onClick={deteleSelectedCredentialOnServer}>Delete Item</button>);
     }
- 
-    let overlay;  
 
-    if ( !overlayVisible ) {
+    let overlay;
+
+    if (!overlayVisible) {
         overlay = <div></div>;
     } else {
-        switch(overlayMode) {
+        switch (overlayMode) {
             case "edit":
                 overlay = (
-                 <TransparentOverlay>
-                    <CredentialInputForm
-                        cancelCallback={hideOverlay}
-                        submitCallback={changeCredentialOnServer}
-                        credential={props.repoObject.repo[selectedIdx]}
-                    />
-                 </TransparentOverlay>
+                    <TransparentOverlay>
+                        <CredentialInputForm
+                            cancelCallback={hideOverlay}
+                            submitCallback={changeCredentialOnServer}
+                            credential={props.repoObject.repo[selectedIdx]}
+                        />
+                    </TransparentOverlay>
                 );
                 break;
             default:
                 overlay = (
-                 <TransparentOverlay>
-                    <CredentialInputForm
-                        cancelCallback={hideOverlay}
-                        submitCallback={createCredentialOnServer}
-                        credential={null}
-                    />
-                 </TransparentOverlay>
+                    <TransparentOverlay>
+                        <CredentialInputForm
+                            cancelCallback={hideOverlay}
+                            submitCallback={createCredentialOnServer}
+                            credential={null}
+                        />
+                    </TransparentOverlay>
                 );
                 break;
-                
+
         }
     }
 
     return (
-        <div>
+        <div className="tab-body">
             {overlay}
             <div>
                 {repoEditButtons}
@@ -158,10 +158,10 @@ export default function RepoTab(props) {
             <table className="repo-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>URL</th>
-                        <th>Username</th>
-                        <th>Password</th>
+                        <th className="repo-name-col">Name</th>
+                        <th className="repo-url-col">URL</th>
+                        <th className="repo-username-col">Username</th>
+                        <th className="repo-password-col">Password</th>
                     </tr>
                 </thead>
                 <tbody>

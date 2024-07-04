@@ -411,7 +411,7 @@ function AdminOrgUnitsPanel(props) {
         return <div>Error: {errorMsg}</div>;
     } else {
         return (
-            <div id="admin-org-unit-tab">
+            <div id="admin-org-unit-tab" className="tab-body">
                 <div>
                     {overlay}
                     {tableGroups}

@@ -275,13 +275,13 @@ export default function AdminUsersTab(props) {
 
         return (
                     <tr key={user._id}>
-                        <td>{user.firstName} {user.lastName}</td>
-                        <td>{user.email}</td>
-                        <td className="title-column">{user.position}</td>
-                        <td className="role-column">{user.role}</td>
+                        <td className="admin-name-col">{user.firstName} {user.lastName}</td>
+                        <td className="admin-email-col">{user.email}</td>
+                        <td className="admin-title-col">{user.position}</td>
+                        <td className="admin-role-col">{user.role}</td>
                         {accessButtons}
-                        <td className="button-column"><button value={index} onClick={openRepoAccessOverlay}>Department access</button></td>
-                        <td className="button-column"><button value={user._id} onClick={deleteUserButtonPress}>Delete User</button></td>
+                        <td className="admin-button-col"><button value={index} onClick={openRepoAccessOverlay}>Department access</button></td>
+                        <td className="admin-button-col"><button value={user._id} onClick={deleteUserButtonPress}>Delete User</button></td>
                     </tr>
         )
     }) 
@@ -292,15 +292,15 @@ export default function AdminUsersTab(props) {
         return <div></div>;
     } else {
         return (
-            <div>
+            <div className="tab-body">
                 {overlay}
                 <table id="admin-users-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Title</th>
-                            <th colSpan="3">Access Level</th>
+                            <th className="admin-name-col">Name</th>
+                            <th className="admin-email-col">Email</th>
+                            <th className="admin-title-col">Title</th>
+                            <th colSpan="3" className="admin-center-title">Access Level</th>
                         </tr>
                     </thead>
                     <tbody>

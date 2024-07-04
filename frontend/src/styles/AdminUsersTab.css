@@ -8,21 +8,30 @@
 }
 
 #admin-users-table td {
-    border : 1px black solid;
-    padding : 4px 10px;
+    padding : 6px 10px;
 }
 
-#admin-users-table td.button-column {
+#admin-users-table td.admin-button-col {
+    width : 175px;
+    text-align : center;
+}
+
+#admin-users-table td.admin-title-col {
     width : 110px;
     text-align : center;
 }
 
-#admin-users-table td.role-column {
+#admin-users-table td.admin-role-col {
     width : 60px;
     text-align : center;
 }
 
-#admin-users-table td.title-column {
+#admin-users-table td.admin-title-col {
     min-width : 60px;
     text-align : center;
 }
+
+#admin-users-table th.admin-center-title {
+    text-align : center;
+}
+
