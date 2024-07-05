@@ -108,7 +108,6 @@ export default function RepoScreen(props) {
             )
         });
         if (repoObjects.length >0 ) {
-                console.log(`index: ${activeTabIndex}`);
             return (
                 <div className="content-wrapper">
                     <div className="tab-head-container">

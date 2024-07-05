@@ -16,7 +16,6 @@ export default function AdminUsersTab(props) {
     const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
     const [errorState, setErrorState] = useState(false);
     const [ overlayVisible, setOverlayVisible ] = useState(false);
-    const [ overlayMode, setOverlayMode ] = useState("");
     
     
     /**
@@ -193,13 +192,11 @@ export default function AdminUsersTab(props) {
     
     if (!loaded && !loading && !errorState) {
         setLoading(true);
-        console.log("loading data");
         let usersLoaded = false;
         
         function handleUserSuccess (data) {
             setUsers(data);
             usersLoaded = true;
-            console.log("Users loaded");
         }
 
         function handleOrgSuccess(data) {
@@ -208,11 +205,9 @@ export default function AdminUsersTab(props) {
                 setLoaded(true);
                 setLoading(false);
             }
-            console.log("Orgs loaded");
         }
 
         getData('/api/users',  handleUserSuccess, null, null, (response) => {
-            console.log("Handling bad response");
             setErrorState(true);
             setLoading(false);
             switch (response.status) {
@@ -227,8 +222,6 @@ export default function AdminUsersTab(props) {
                 default:
                     props.showToastMessage("Server error", "An error occurred on the server.", "warning");
             }
-            console.log(`Errorstate: ${errorState}`);
-                
         });
 
         getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);

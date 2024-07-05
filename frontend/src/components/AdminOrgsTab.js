@@ -62,8 +62,6 @@ function AdminOrgUnitsPanel(props) {
                     props.showToastMessage("Error", "You don't have the correct privileges to perform this action", "danger");
                     break;
                 default:
-                    console.log(`Code received: ${response.status}`);
-                    console.log(response);
                     props.showToastMessage("Error", "An error occured on the server", "warning");
                     break;
             }
