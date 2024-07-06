@@ -71,12 +71,13 @@ class App extends React.Component {
                 element={<RepoScreen showToastMessage={this.showToastMessage} currentUser={this.state.currentUser}/>} />),
             (<Route key="profile" path="/profile" element={<ProfileScreen showToastMessage={this.showToastMessage}
                 setCurrentUser={this.setCurrentUser} />} />),
+            (<Route key="admin" path="/admin" element={<AdminPanel
+                showToastMessage={this.showToastMessage}
+                currentUser={this.state.currentUser}
+            />} />)
         ];
 
-        if (this.state.currentUser && this.state.currentUser.role == 'admin') {
-            mainPageRoutes.push(<Route key="admin" path="/admin" element={<AdminPanel showToastMessage={this.showToastMessage} />} />);
 
-        }
         return (
             <div className="App">
                 <Routes>
@@ -92,19 +93,19 @@ class App extends React.Component {
                     />
                     <Route path="/"
                         element={(<PrivateRoute currentUser={this.state.currentUser}>
-                            <MainPageLayout 
-                                currentUser={this.state.currentUser}
-                                setCurrentUser={this.setCurrentUser}
-                                toastVisible={this.state.toastMessageVisible}
-                                changeToastVisibility={this.changeToastVisibility}
-                                showToastMessage={this.showToastMessage}
-                                toastTitle={this.state.toastTitle}
-                                toastMessage={this.state.toastMessage}
-                                toastVariant={this.state.toastVariant}
-                                test={this.test}
-                                logout={this.logout}
-                            />
-                        </PrivateRoute>)}
+                                    <MainPageLayout 
+                                        currentUser={this.state.currentUser}
+                                        setCurrentUser={this.setCurrentUser}
+                                        toastVisible={this.state.toastMessageVisible}
+                                        changeToastVisibility={this.changeToastVisibility}
+                                        showToastMessage={this.showToastMessage}
+                                        toastTitle={this.state.toastTitle}
+                                        toastMessage={this.state.toastMessage}
+                                        toastVariant={this.state.toastVariant}
+                                        test={this.test}
+                                        logout={this.logout}
+                                    />
+                                </PrivateRoute>)}
                     >
                         {mainPageRoutes}
                     </Route>
@@ -175,4 +176,3 @@ const PrivateRoute = (props) => {
     />
   )
 }
-      //state={{ from: `${location.pathname}${location.search}` }}
