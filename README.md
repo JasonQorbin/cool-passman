@@ -21,6 +21,6 @@ You can also assign a custom port number.
 4. start the server by running `npm start`.
 5. When seeding the database, 5 Organisational units were create with 5 departments each. The first user in each Org unit
 is created as an admin-level user that has the privileges to change the company structure and define user roles. e.g.
-logging in with the sername 'New-user1@example.com` will allow you to configure the server. (The default password for 
+logging in with the sername `New-user1@example.com` will allow you to configure the server. (The default password for 
 all users is `password`.
 
