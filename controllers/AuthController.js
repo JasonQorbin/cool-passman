@@ -13,7 +13,7 @@ let jwtSecret = process.env.TOKEN_SECRET || "Testing_Secret";
 const numberOfSaltRounds = 14;
 
 function generatePasswordHash(password) {
-    bcrypt.hash(password, numberOfSaltRounds);
+    return bcrypt.hash(password, numberOfSaltRounds);
 }
 
 function verifyPasswordHash(password, hash) {
