@@ -1,4 +1,5 @@
 import '../styles/PageHeader.css';
+import CoolTechLogo from './CoolTechLogo';
 
 /**
   * Component for the page header in the Main Page Layout
@@ -10,7 +11,7 @@ function PageHeader(props) {
             <header id="page-header">
             <div className="side-by-side">
                 <div className="left-left">
-                    <h1>Cool-Tech Password Manager</h1>
+                    <h1><CoolTechLogo /><br />Password Manager</h1>
                 </div>
                 <div className="right-right">
                     <p>Welcome, {currentUserName}</p>

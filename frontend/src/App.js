@@ -1,5 +1,5 @@
-import "./App.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "./App.css";
 import React, { useState } from 'react';
 import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import PageHeader from "./components/PageHeader";
@@ -77,12 +77,16 @@ class App extends React.Component {
             mainPageRoutes.push(<Route key="admin" path="/admin" element={<AdminPanel showToastMessage={this.showToastMessage} />} />);
 
         }
-        
         return (
             <div className="App">
                 <Routes>
                     <Route path="/login" 
                         element={<LoginScreen setCurrentUser={this.setCurrentUser}
+                        showToastMessage={this.showToastMessage} 
+                        currentUser={this.state.currentUser} />} 
+                    />
+                    <Route path="/loading" 
+                        element={<LoadingWidget setCurrentUser={this.setCurrentUser}
                         showToastMessage={this.showToastMessage} 
                         currentUser={this.state.currentUser} />} 
                     />

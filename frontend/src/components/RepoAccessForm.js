@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { patchData } from '../utils/fetching';
+import '../styles/RepoAccessForm.css';
 
 /**
   * Form displayed in an overlay window that allows admin to change the access privileges of
@@ -140,9 +141,9 @@ export default function RepoAccessForm(props) {
 
             return (
                 <tr key={index}>
-                        <td>{org.name}</td>
-                        <td>{dept.name}</td>
-                        <td><button onClick={removeAccess}>Remove Access</button></td>
+                        <td className="admin-access-form-OU-col">{org.name}</td>
+                        <td className="admin-access-form-dept-col">{dept.name}</td>
+                        <td className="admin-access-form-button-col"><button onClick={removeAccess}>Remove Access</button></td>
                 </tr>
             );
         });
@@ -151,9 +152,9 @@ export default function RepoAccessForm(props) {
             <table>
                 <thead>
                     <tr>
-                        <th>Org Unit</th>
-                        <th>Department</th>
-                        <th></th>
+                        <th className="admin-access-form-OU-col">Org Unit</th>
+                        <th className="admin-access-form-dept-col">Department</th>
+                        <th className="admin-access-form-button-col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,11 +173,11 @@ export default function RepoAccessForm(props) {
             <select id="org-selector" onChange={updateDepartmentChoices}>
                 {orgOptions}
             </select>
-            <label htmlFor="dept-selector">Organisational Unit:</label>
+            <label htmlFor="dept-selector">Department:</label>
             <select id="dept-selector">
                 {deptChoices}
             </select>
-            <button onClick={addDepartmentAccess}>Add</button>
+            <button id="add-access-button" onClick={addDepartmentAccess}>Add</button>
             <hr />
             <h2>Current access:</h2>
             {existingAuthorisations}

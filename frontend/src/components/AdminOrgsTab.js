@@ -390,6 +390,7 @@ function AdminOrgUnitsPanel(props) {
         }); 
         authorisedUsersTable = (
             <table>
+                <caption>Authorised Users:</caption>
                 <thead>
                     <tr>
                         <th>Name</th>

@@ -1,0 +1,22 @@
+#profile-form-body {
+    padding: 40px;
+}
+
+.profile-form-row {
+    padding : 0.5rem;
+}
+
+.profile-button-row {
+    padding : 0.5rem;
+    display : flex;
+    flex-direction : row;
+    width : 100%;
+    justify-content : right;
+}
+
+.profile-form-row label {
+    width: 200px;
+    text-align : right;
+    margin : 0 1rem;
+}
+

@@ -2,6 +2,7 @@ import "../styles/LoginScreen.css";
 import { getData, postData } from '../utils/fetching';
 import { sessionTokenKey } from '../utils/constants';
 import { useNavigate } from 'react-router-dom';
+import CoolTechLogo from "./CoolTechLogo";
 
 export default function LoginScreen(props) {
     const navigate = useNavigate();
@@ -61,18 +62,18 @@ export default function LoginScreen(props) {
 
     return (
         <div className="centre-container">
-        <h1>Cool Tech Logo Placeholder</h1>
+        <h1><CoolTechLogo /></h1>
         <p>You are accessing sensitive information. Please log in to proceed.</p>
         <form id="login-form" onSubmit={handleLogin}>
-            <div className="form-row">
+            <div className="login-form-row">
                 <span className="login-label-wrapper"><label htmlFor="login-email-field">Email:</label></span>
                 <input type="email" id="login-email-field" className="login-field" placeholder="username@cool-tech.com" required />
             </div>
-            <div className="form-row">
+            <div className="login-form-row">
                 <span className="login-label-wrapper"><label htmlFor="login-password-field">Password:</label></span>
                 <input type="password" id="login-password-field" className="login-field" required />
             </div>
-            <div className="form-row centre">
+            <div className="login-form-row centre">
                 <input type="submit" id="login-button" value="Log in" />
             </div>
         </form>

@@ -1,4 +1,34 @@
 /* Global styles will be placed in this file */
+
+@font-face {
+    font-family : permanent-marker;
+    src: url('./assets/font_perm_marker/PermanentMarker-Regular.ttf');
+}
+
+.App {
+    font-family : montserat, sans-serif;
+}
+
+.Cool-Tech-Logo {
+
+    font-family : permanent-marker, Arial Black, sans-serif;
+}
+
+.blue-text {
+    color : blue;
+}
+
+.loading-div {
+    display : flex;
+    justify-content : center;
+    align-items: center;
+}
+
+.loading-throbber {
+    max-width : 320px;
+    max-height : 200px;
+}
+
 .centre-container {
     display : flex;
     flex-direction: column;
@@ -36,6 +66,14 @@ span.vertical-spacer {
     width : 100%;
     height : 100%;
     margin : 0 40px 0 20px;
+}
+
+hr.blue-divider {
+    background-color : blue;
+    height :  3px;
+    border : 0;
+    opacity : 1;
+
 }
 
 .transparent-layer {
@@ -123,6 +161,9 @@ button.tab-head p {
     position : relative;
     top: -20px;
     box-shadow: 10px 10px 5px -2px grey;
+    border-left : 1px solid lightgrey;
+    border-bottom : 1px solid lightgrey;
+    border-right : 1px solid lightgrey;
 }
 
 tbody th, table tbody td {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getData, putData, patchData } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
+import '../styles/ProfileScreen.css';
 
 /**
   * Component for the user profile screen. Allows the user to edit their details and change 
@@ -65,6 +66,7 @@ export default function ProfileScreen(props) {
             });
         }
     }
+
     /**
       * Custom validation function for the password form that ensures that new password and the 
       * confirmation field have the same value.
@@ -98,39 +100,43 @@ export default function ProfileScreen(props) {
         return <LoadingWidget />;
     } else  {
         return ( 
-            <div>
+            <div id="profile-form-body">
                 <h1>User profile - {tempUser.firstName} {tempUser.lastName}</h1>
+
                 <hr className="blue-divider" />
+
                 <form onSubmit={sendUserUpdateToServer}>
                     <h2>Edit your profile:</h2>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="first-name-field">First name(s):</label>
                         <input type="text" defaultValue={tempUser.firstName} id="first-name-field" />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="last-name-field">last name:</label>
                         <input type="text" defaultValue={tempUser.lastName} id="last-name-field" />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="email-field">Email:</label>
                         <input type="text" defaultValue={tempUser.email} id="email-field" />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="position-field">Job title:</label>
                         <input type="text" defaultValue={tempUser.position} id="position-field" />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-button-row">
                         <input type="submit" value="Confirm" id="user-edit-submit" />
                     </div>
                 </form>
+
                     <hr className="blue-divider" />
+
                 <form onSubmit={requestPasswordChange}>
                     <h2>Change your password:</h2>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="old-password-field">Old password:</label>
                         <input type="password" id="old-password-field" placeholder="Old password" required/>
                     </div>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="new-password-field">New password:</label>
                         <input type="password"
                             id="new-password-field"
@@ -140,7 +146,7 @@ export default function ProfileScreen(props) {
                             required
                         />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-form-row">
                         <label htmlFor="new-password-confirm-field">Confirm new password:</label>
                         <input type="password"
                             id="new-password-confirm-field"
@@ -151,7 +157,7 @@ export default function ProfileScreen(props) {
 
                         />
                     </div>
-                    <div className="form-row">
+                    <div className="profile-button-row">
                         <input type="submit" value="Change" id="password-change-submit" />
                     </div>
                 </form>
