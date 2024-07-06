@@ -109,9 +109,7 @@ function dropCollection(collectionName, silent) {
   */
 async function resetDatabase(silent) {
     return new Promise( (resolve) => {
-        //if (!mongoose.connection) {
         connectToDatabase();
-        //}
 
         if (!silent){console.log("Resetting database");}
         
