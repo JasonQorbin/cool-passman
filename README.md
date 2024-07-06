@@ -17,9 +17,12 @@ database and needs to run in an environment with a NodeJS runtime for the expres
 build the frontend artifacts.
 2. Create a `.env` file (sample provided in `sample.env`) and provide the connection string from your MongoDB instance.
 You can also assign a custom port number.
-3. Seed the database by running `npm run seed`.
-4. start the server by running `npm start`.
-5. When seeding the database, 5 Organisational units were create with 5 departments each. The first user in each Org unit
+3. If running in a production environment, make sure to set the NODE_ENV environment variable to `production`. If you 
+don't do this the app will assume it is running in a development environment and try to connect to a local MongoDB instance,
+ingoring the connection string set in the .env file.
+4. Seed the database by running `npm run seed`.
+5. start the server by running `npm start`.
+6. When seeding the database, 5 Organisational units were create with 5 departments each. The first user in each Org unit
 is created as an admin-level user that has the privileges to change the company structure and define user roles. e.g.
 logging in with the sername `New-user1@example.com` will allow you to configure the server. (The default password for 
 all users is `password`.
