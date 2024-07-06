@@ -5,7 +5,6 @@ function SideBar(props) {
     const sidebarLinks = [
         <li key="repos"><Link to="/repos" className="sidebar-item">My Repositories</Link></li>,
         <li key="profile"><Link to="/profile" className="sidebar-item">My Profile</Link></li>,
-        <li key="profile"><Link to="/loading" className="sidebar-item">Loading</Link></li>
     ];
     
     //Only display the link to the admin panel if an admin is logged in.

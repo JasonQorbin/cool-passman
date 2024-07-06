@@ -85,11 +85,6 @@ class App extends React.Component {
                         showToastMessage={this.showToastMessage} 
                         currentUser={this.state.currentUser} />} 
                     />
-                    <Route path="/loading" 
-                        element={<LoadingWidget setCurrentUser={this.setCurrentUser}
-                        showToastMessage={this.showToastMessage} 
-                        currentUser={this.state.currentUser} />} 
-                    />
                     <Route path="/register"
                         element={<RegisterScreen
                         showToastMessage={this.showToastMessage}
