@@ -26,6 +26,7 @@ Please set the TOKEN_SECRET environment variable to an appropriate value and try
     process.exit(1);
 }
 
+//Attach middleware
 
 app.use(helmet());
 
@@ -34,10 +35,10 @@ app.use(bodyParser.json());
 
 app.use(requestLogging);
 
-app.get('/', (request, response) => {
-    response.status(200).send("Hello World!!!").end();
-});
+//Point the default rout to the React app
+app.use('/', express.static('./frontend/build'));
 
+//Assign the router to the correct API paths.
 app.use('/api/users', userRouter);
 app.use('/api/org',orgRouter);
 app.use('/api/repo', repoRouter);
