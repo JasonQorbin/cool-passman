@@ -11,6 +11,17 @@ database and needs to run in an environment with a NodeJS runtime for the expres
 - User roles: Each user is given privilege-levels which determines what they are allow to see or do.
 - API-endpoints all require an authenticated user with the correct permissions also.
 
+## Security note
+
+Please note that this project was a bootcamp assignment on the premise that it would be used as an internal application
+and therefore caution should be exercised if using this application in a production environment. While the passwords 
+for user accounts for the application are stored securely is hashed form the application data 
+(presumably also login credentials) are stored in plain text. 
+
+The application could be extended to use symmetric encryption so that the application data (credentials being stored) 
+are not stored in plain text but for now make sure that this application is only ever deployed on a secure server in
+a private network environment and not exposed to the internet.
+
 ## Installation and usage
 
 1. Clone down the repo and run the `npm run build` command to install all the required dependencies and
@@ -25,7 +36,7 @@ ingoring the connection string set in the .env file.
 6. When seeding the database, 5 Organisational units were create with 5 departments each. The first user in each Org unit
 is created as an admin-level user that has the privileges to change the company structure and define user roles. e.g.
 logging in with the sername `New-user1@example.com` will allow you to configure the server. (The default password for 
-all users is `password`.
+all users is `password`).
 
 ## Resource end-points
 
