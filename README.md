@@ -27,3 +27,28 @@ is created as an admin-level user that has the privileges to change the company 
 logging in with the sername `New-user1@example.com` will allow you to configure the server. (The default password for 
 all users is `password`.
 
+## Resource end-points
+
+| Route                              | Method | Access     | Note                                                      |
+|------------------------------------|--------|------------|-----------------------------------------------------------|
+| `/users`                           | POST   | Anyone     | Invoked from the register page                            |
+| `/users`                           | GET    | Admin      | List all users                                            |
+| `/users/password-change`           | PATCH  | Self       | User changes their own password                           |
+| `/users/self`                      | GET    | User       | Get current user profile based on auth token              |
+| `/users/list-users/:orgID/:deptID` | GET    | Admin      | List the users that have privileges for the given dept/org|
+| `/users/$userID`                   | DELETE | Admin      | Delete a user                                             |
+| `/users/$userID`                   | PUT    | Admin/user | A user can change his own profile. Otherwise only admins  |
+| `/users/$userID/add-dept`          | PATCH  | Admin      | Add to the list of departments the user can access        |
+| `/users/$userID/remove-dept`       | PATCH  | Admin      | Remove from the list of departments the user can access   |
+| `/org`                             | GET    | User       | List all Organisational Units                             |
+| `/org`                             | POST   | Admin      | Create new Organisational Unit                            |
+| `/org/$orgID`                      | DELETE | Admin      | Delete an Organisational Unit                             |
+| `/org/$orgID`                      | PATCH  | Admin      | Rename an Organisational Unit                             |
+| `/org/$orgID`                      | POST   | Admin      | Create a new department                                   |
+| `/org/$orgID/$deptID`              | DELETE | Admin      | Delete a department                                       |
+| `/org/$orgID/$deptID`              | PUT    | Admin      | Rename a department                                       |
+| `/repo`                            | GET    | User       | Get the repos for the current user token                  |
+| `/repo/$orgID/$deptID`             | POST   | User       | Add new credential in repo                                |
+| `/repo/$orgID/$deptID/$credID`     | GET    | User       | Get specific credential in repo                           |
+| `/repo/$orgID/$deptID/$credID`     | PUT    | Manager    | Update specific credential in repo                        |
+| `/repo/$orgID/$deptID/$credID`     | DELETE | Manager    | Delete specific credential in repo                        |
