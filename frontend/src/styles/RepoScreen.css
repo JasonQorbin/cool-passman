@@ -1,26 +1,3 @@
-/*
-table.repo-table {
-    border-collapse : collapse;
-    margin : 30px;
-}
-
-table.repo-table th, table.repo-table td {
-    border : 1px black solid;
-    padding : 0.25rem 0.5rem;
-}
-
-
-table.repo-table tbody tr:hover {
-    background : lightpink;
-}
-
-
-table.repo-table tbody tr.selected {
-    background : lightsalmon;
-}
-
-*/
-
 .repo-name-col, .repo-url-col, .repo-username-col, .repo-password-col {
     min-width: 250px;
 }
