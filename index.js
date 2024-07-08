@@ -1,3 +1,4 @@
+const path = require('path');
 //Express app
 const express = require( 'express' );
 const app = express();
@@ -35,14 +36,17 @@ app.use(bodyParser.json());
 
 app.use(requestLogging);
 
-//Point the default rout to the React app
-app.use('/', express.static('./frontend/build'));
-
 //Assign the router to the correct API paths.
 app.use('/api/users', userRouter);
 app.use('/api/org',orgRouter);
 app.use('/api/repo', repoRouter);
 app.use('/api', authRouter);
+
+//Point the default rout to the React app
+app.use(express.static(path.join(__dirname,'frontend/build')));
+app.get('*',(request ,response)=> {
+    response.sendFile(path.resolve(__dirname,'frontend', 'build','index.html'))
+});
 
 connectToDatabase();
 
