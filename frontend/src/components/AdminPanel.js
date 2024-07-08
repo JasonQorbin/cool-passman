@@ -1,4 +1,3 @@
-import '../styles/AdminPanel.css';
 import AdminOrgUnitsTab from './AdminOrgsTab'; 
 import AdminUsersTab from './AdminUsersTab';
 import { useState } from 'react';
