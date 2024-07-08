@@ -1,4 +1,4 @@
-import '../styles/AdminOrgsTab.css';
+import "../styles/AdminOrgsTab.css";
 import { getData, postData, patchData, deleteResource } from '../utils/fetching';
 import LoadingWidget from './LoadingWidget';
 import SimpleItemTable from './SimpleItemTable';
@@ -389,7 +389,7 @@ function AdminOrgUnitsPanel(props) {
             )
         }); 
         authorisedUsersTable = (
-            <table>
+            <table id="admin-org-table">
                 <caption>Authorised Users:</caption>
                 <thead>
                     <tr>
