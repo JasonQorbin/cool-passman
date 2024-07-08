@@ -167,7 +167,6 @@ async function getAuthorisedUsers( request, response ) {
         return newObject;
         
     });
-    console.log(sanitizedUsers);
 
     response.status(StatusCodes.SUCCESS).send(sanitizedUsers);
 }
@@ -189,7 +188,6 @@ async function removeDepartment( request, response ) {
         return;
     }
     
-    console.log(userDoc.authorised_repos);
     const authorisationToDelete = userDoc.authorised_repos.filter( (authRecord) => {
         return authRecord.orgID == request.body.orgID && authRecord.deptID == request.body.deptID;
     }).pop();
