@@ -195,8 +195,9 @@ export default function AdminUsersTab(props) {
         let usersLoaded = false;
         
         function handleUserSuccess (data) {
-            setUsers(data);
             usersLoaded = true;
+            setUsers(data);
+            getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);
         }
 
         function handleOrgSuccess(data) {
@@ -224,7 +225,6 @@ export default function AdminUsersTab(props) {
             }
         });
 
-        getData('/api/org', handleOrgSuccess, null, null, handleFailedResponse);
     }
     
     //Popluate the overlay form if required.
