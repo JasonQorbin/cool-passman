@@ -78,9 +78,7 @@ export default function LoginScreen(props) {
             </div>
         </form>
             <div className="centre">
-                <a href="#">Register</a>
-                <span className="vertical-spacer">|</span>
-                <a href="#">Forgot my password</a>
+                New users: <a href="/register">Register</a>
             </div>
         </div>
     );
