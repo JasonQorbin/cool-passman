@@ -1,3 +1,15 @@
 .repo-name-col, .repo-url-col, .repo-username-col, .repo-password-col {
     min-width: 250px;
 }
+
+.tab-body button {
+    margin : 0 1.2rem;
+}
+
+.repo-table tbody tr:hover {
+    background: lightpink;
+}
+
+.repo-table tbody tr.selected {
+    background: lightsalmon;
+}

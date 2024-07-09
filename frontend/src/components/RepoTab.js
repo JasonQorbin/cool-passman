@@ -1,3 +1,4 @@
+import '../styles/RepoScreen.css';
 import { useState } from 'react';
 import { deleteResource, postData, putData } from '../utils/fetching';
 import TransparentOverlay from './TransparentOverlay';
@@ -95,10 +96,11 @@ export default function RepoTab(props) {
 
     const repoTableRows = props.repoObject.repo.map(
         (credential, index) => {
+            const classString = selectedIdx == index ? "selected" : "";
             return (
                 <tr key={index}
                     onClick={() => setSelectedIdx(index)}
-                    className={selectedIdx == index ? "selected" : ""}>
+                    className={classString}>
                     <td>{credential.name}</td>
                     <td>{credential.url}</td>
                     <td>{credential.username}</td>
