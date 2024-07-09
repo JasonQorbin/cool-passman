@@ -245,7 +245,6 @@ async function getRepos( request, response ) {
 }
 
 async function addCredential ( request, response ) {
-    console.log("In the adding function...");
     //A credential should have a name and at least one other field to save.
     const requestHasEnoughFields = 
         request.body.hasOwnProperty('name') &&
@@ -274,7 +273,6 @@ async function addCredential ( request, response ) {
         return;
     }
 
-    console.log("checks done");
 
     const newCredential = {name : request.body.name};
     if (request.body.hasOwnProperty('url')) { newCredential.url = request.body.url };
@@ -284,7 +282,6 @@ async function addCredential ( request, response ) {
     department.repo.push(newCredential);
     const docToSave = department.repo[department.repo.length-1];
     const savedDoc = await org.save();
-    console.log(savedDoc);
     
     response.status(StatusCodes.SUCCESS).send(newCredential);
 }
