@@ -60,12 +60,39 @@ function addUser(savedOrg, userIndex) {
 }
 
 function addOrg(orgName, silent) {
+    const defaultRepo = [
+        {
+            name: 'Credential 1',
+            url: 'location.example.net',
+            username: 'user',
+            password: 'pass',
+        },
+        {
+            name: 'Credential 2',
+            url: 'somewhere.else.example.net',
+            username: 'name',
+            password: 'pass',
+        },
+        {
+            name: 'Credential 3',
+            url: 'resource.example.net',
+            username: 'person',
+            password: 'secret',
+        },
+        {
+            name: 'Credential 4',
+            url: 'database.example.net',
+            username: 'avatar',
+            password: 'passw',
+        },
+    ]
+
     const depts = [
-        { name: "Writing", repo:[]},
-        { name: "Production", repo:[]},
-        { name: "Finance", repo:[]},
-        { name: "HR", repo:[]},
-        { name: "IT", repo:[]}
+        { name: "Writing", repo: defaultRepo},
+        { name: "Production", repo: defaultRepo},
+        { name: "Finance", repo: defaultRepo},
+        { name: "HR", repo: defaultRepo},
+        { name: "IT", repo: defaultRepo}
     ];
     
     return new Promise( (resolve) => {
