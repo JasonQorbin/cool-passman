@@ -80,6 +80,11 @@ export default function LoginScreen(props) {
             <div className="centre">
                 New users: <a href="/register">Register</a>
             </div>
+            <div id="hint-div">
+                <p><em>Test user</em></p>
+                <p><em>email: user@example.com</em></p>
+                <p><em>password: password</em></p>
+            </div>
         </div>
     );
 }

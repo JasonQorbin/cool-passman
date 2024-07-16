@@ -18,3 +18,9 @@
     font-size : 14pt;
     padding: 0 0.5rem;
 }
+
+#hint-div {
+    position : fixed;
+    bottom : 0;
+    left : 10px;
+}
