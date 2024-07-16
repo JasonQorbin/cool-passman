@@ -1,6 +1,7 @@
 import "../styles/RegisterScreen.css";
 import { postData } from '../utils/fetching';
 import { useNavigate } from "react-router-dom";
+import CoolTechLogo from './CoolTechLogo'
 const requiredPasswordLength = 8;
 
 /**
@@ -88,7 +89,7 @@ export default function RegisterScreen() {
     return (
         <div className="centre-container">
             <div id="registration-content-wrapper">
-                <h1>Cool Tech Logo Placeholder</h1>
+                <h1><CoolTechLogo /></h1>
                 <p className="info-text">
                     Note that your account will be created with no privileges.<br />Only once an 
                     administrator assigns your account to your respective department will you be
@@ -152,7 +153,7 @@ export default function RegisterScreen() {
                     </div>
                     <div className="form-row">
                         <span className="registration-label-wrapper">
-                            <label htmlFor="registration-password-confirmation-field">Password:</label>
+                            <label htmlFor="registration-password-confirmation-field">Confirm Password:</label>
                         </span>
                         <input type="password" 
                             id="registration-password-confirmation-field"
