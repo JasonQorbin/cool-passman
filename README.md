@@ -3,6 +3,8 @@
 Cool-pass is a full-stack web-app that creates a online store for log-in credentials
 for a fictious company called Cool-Tech.
 
+[Github Link](https://github.com/JasonQorbin/cool-passman)
+
 The app uses the MERN stack, meaning that it expects you to provide access to a MongoDB
 database and needs to run in an environment with a NodeJS runtime for the express server.
 
@@ -35,8 +37,19 @@ ingoring the connection string set in the .env file.
 5. start the server by running `npm start`.
 6. When seeding the database, 5 Organisational units were create with 5 departments each. The first user in each Org unit
 is created as an admin-level user that has the privileges to change the company structure and define user roles. e.g.
-logging in with the sername `New-user1@example.com` will allow you to configure the server. (The default password for 
+logging in with the sername `News-user1@example.com` will allow you to configure the server. (The default password for 
 all users is `password`).
+
+## Users in the seeded database
+
+| User emails                                                 | Organisational Unit (OU) |
+|-------------------------------------------------------------|--------------------------|
+|`News-user1@example.com` - `News-user10@example.com`         | News Management          |
+|`Hardware-user1@example.com` - `Hardware-user10@example.com` | Hardware Reviews         |
+|`Software-user1@example.com` - `Software-user10@example.com` | Software Reviews         |
+|`Video-user1@example.com` - `Video-user10@example.com`       | Video Content            |
+|`Opinion-user1@example.com` - `Opinion-user10@example.com`   | Opinion Publishing       |
+
 
 ## Resource end-points
 
