@@ -9,6 +9,7 @@ const environment = app.get('env');
 //External packages
 const bodyParser = require( 'body-parser' );
 const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
 //Routers
 const authRouter = require('./routes/loginRoutes');
 const orgRouter = require('./routes/orgRoutes');
@@ -18,6 +19,14 @@ const repoRouter = require('./routes/repoRoutes');
 const { requestLogging } = require('./middleware/logging');
 //Database
 const { connectToDatabase } = require('./config/database');
+
+//Configure rate limiting paramters:
+const limiter = rateLimit({
+	windowMs: 5 * 60 * 1000, // 5 minute(s)
+	limit: 100, // Limit each IP to 100 requests per `window'.
+	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+});
 
 //Make sure that a secret has been provided for generating tokens if we are running in production.
 if (!process.env.TOKEN_SECRET && environment === 'production') {
@@ -31,6 +40,7 @@ Please set the TOKEN_SECRET environment variable to an appropriate value and try
 //Attach middleware
 
 app.use(helmet());
+app.use(limiter);
 
 app.use(bodyParser.urlencoded( {  extended : true } ));
 app.use(bodyParser.json());
