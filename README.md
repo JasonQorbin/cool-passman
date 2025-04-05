@@ -17,7 +17,7 @@ database and needs to run in an environment with a NodeJS runtime for the expres
 
 Please note that this project was a bootcamp assignment on the premise that it would be used as an internal application
 and therefore caution should be exercised if using this application in a production environment. While the passwords 
-for user accounts for the application are stored securely is hashed form the application data 
+for user accounts for the application are stored securely in hashed form, the application data inside the repo
 (presumably also login credentials) are stored in plain text. 
 
 The application could be extended to use symmetric encryption so that the application data (credentials being stored) 
